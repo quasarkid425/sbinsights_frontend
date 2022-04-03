@@ -1,0 +1,46 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.link-hover {
+  transition: all 0.5s;
+}
+
+.link-hover:hover {
+  color: #51cf66;
+}
+
+.link-icon {
+  transition: all 0.5s;
+}
+
+.link-icon:hover {
+  color: #51cf66;
+}
+
+.arrow-tax {
+  transform: rotate(20deg);
+}
+
+.arrow-account {
+  transform: rotate(90deg);
+}
+
+@media only screen and (max-width: 800px) {
+  .arrow-tax {
+    transform: rotate(-44deg);
+  }
+}
