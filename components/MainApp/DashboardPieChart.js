@@ -46,4 +46,3 @@ const DashboardPieChart = () => {
 };
 
 export default DashboardPieChart;
-import React from "react";
