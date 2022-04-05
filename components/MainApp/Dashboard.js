@@ -20,7 +20,6 @@ import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { chartActions } from "../../store/chartSlice";
-import DashboardLayout from "./DashboardLayout";
 
 const Dashboard = ({ pieDashData, lineDashData }) => {
   const { user } = useSelector((state) => state.user);

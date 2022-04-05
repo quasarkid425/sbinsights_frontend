@@ -26,7 +26,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { accountActions } from "../../store/accountSlice";
 import AddAccount from "./accounts/modals/AddAccount";
-import { taxActions } from "../../store/taxSlice";
 
 const Accounts = () => {
   const { user } = useSelector((state) => state.user);

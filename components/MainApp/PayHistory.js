@@ -27,14 +27,12 @@ import { AiOutlineClose } from "react-icons/ai";
 import { BiSortAlt2 } from "react-icons/bi";
 import { employeeActions } from "../../store/employeeSlice";
 import { removePaidEntry, retrieveEmployeeData } from "../../actions/employees";
-import { retrieveAccountData } from "../../../server/controllers/accounts";
 
 const PayHistory = () => {
   const [inputDropName, setInputDropName] = useState("");
   const [date, setDate] = useState("asc");
   const [entryId, setEntryId] = useState("");
   const { user } = useSelector((state) => state.user);
-  const { employees } = useSelector((state) => state.employees);
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { company, empNo } = useRouter().query;

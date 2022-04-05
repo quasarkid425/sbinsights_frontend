@@ -15,7 +15,7 @@ import {
   Tooltip,
   Box,
 } from "@chakra-ui/react";
-import { IoIosAdd, IoIosClose, IoIosAddCircleOutline } from "react-icons/io";
+import { IoIosClose } from "react-icons/io";
 import { FiDollarSign } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
 import { setUpTaxes } from "../../../../actions/taxes";

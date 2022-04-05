@@ -33,7 +33,6 @@ import {
 } from "@chakra-ui/react";
 import { IoIosAdd, IoIosClose, IoIosAddCircleOutline } from "react-icons/io";
 import { BsArrowUp } from "react-icons/bs";
-import { FiDollarSign } from "react-icons/fi";
 import { IoIosCheckboxOutline, IoIosCheckbox } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
 import { accountActions } from "../../store/accountSlice";
@@ -55,7 +54,6 @@ const Entries = ({ historyRef }) => {
   const { accounts } = useSelector((state) => state.accounts);
   const { taxes, selectedStates } = useSelector((state) => state.taxes);
   const { user } = useSelector((state) => state.user);
-  const [isLoading, setIsLoading] = useState(false);
   const [option, setOption] = useState("service");
   const [serviceIndex, setServiceIndex] = useState(0);
   const [descIndex, setDescIndex] = useState(0);
