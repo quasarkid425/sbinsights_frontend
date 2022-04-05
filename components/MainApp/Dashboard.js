@@ -109,7 +109,7 @@ const Dashboard = ({ pieDashData, lineDashData }) => {
             <Stack p={2}>
               <Heading size={"sm"}>Recently Billed Invoices</Heading>
               <Box fontSize={"sm"}>
-                {accounts.map((acc) =>
+                {accounts?.map((acc) =>
                   acc.services.map((service) => (
                     <>
                       <Flex key={uuidv4()} gap={"1rem"} align={"center"} mb={1}>
@@ -153,7 +153,7 @@ const Dashboard = ({ pieDashData, lineDashData }) => {
             <Stack p={2}>
               <Heading size={"sm"}>Saved Pending Invoices</Heading>
               <Box fontSize={"sm"}>
-                {accounts.map((acc) =>
+                {accounts?.map((acc) =>
                   acc.entries.map((entry, index) =>
                     entry.service === "" && entry.desc === "" ? (
                       ""
