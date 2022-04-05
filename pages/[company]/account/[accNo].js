@@ -332,12 +332,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -363,12 +363,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -394,12 +394,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -425,12 +425,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -456,12 +456,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -487,12 +487,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -520,12 +520,12 @@ const AccNo = () => {
                       </Select>
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}
@@ -551,12 +551,12 @@ const AccNo = () => {
                       />
                       <Button
                         size={"sm"}
-                        bg={process.env.NEXT_PUBLIC_BTN}
+                        bg={"btn.100"}
                         _hover={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _active={{
-                          bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#fff"}

@@ -3,6 +3,7 @@ import { getDateByYear } from "../utils/helpers";
 
 const accountState = {
   accounts: [],
+  account: {},
   accountStats: [],
   printInfo: {
     account: {},
@@ -16,7 +17,29 @@ const accountSlice = createSlice({
   initialState: accountState,
   reducers: {
     setAccounts(state, action) {
-      state.accounts = action.payload;
+      const { accounts } = action.payload;
+      const newAccounts = accounts.map((acc) => {
+        return {
+          ...acc,
+          entries: acc.entries.map((ent) => {
+            if (ent.service === "" && ent.desc === "") {
+              return {
+                ...ent,
+                date: getDateByYear(),
+              };
+            } else {
+              return {
+                ...ent,
+              };
+            }
+          }),
+        };
+      });
+      state.accounts = newAccounts;
+    },
+    setAccount(state, action) {
+      const { account } = action.payload;
+      state.account = account;
     },
     addAccount(state, action) {
       state.accounts.unshift(action.payload);
@@ -114,6 +137,8 @@ const accountSlice = createSlice({
       const index = state.accounts.findIndex(
         (acc) => acc._id.toString() === accNo
       );
+
+      state.account = updatedCustomerAccount;
       state.accounts.splice(index, 1, updatedCustomerAccount);
     },
     removeAccount(state, action) {
@@ -124,60 +149,47 @@ const accountSlice = createSlice({
       state.accounts.splice(index, 1);
     },
     addServices(state, action) {
-      const { accNo, entry } = action.payload;
+      const { entry } = action.payload;
 
-      const index = state.accounts.findIndex(
-        (acc) => acc._id.toString() === accNo
-      );
-
-      state.accounts[index].services.unshift(entry);
+      state.account.services.unshift(entry);
     },
     pay(state, action) {
-      const { acc, service } = action.payload;
-      const accIndex = state.accounts.findIndex(
-        (account) => account._id.toString() === acc
-      );
-      const serviceIndex = state.accounts[accIndex].services.findIndex(
+      const { service } = action.payload;
+      const serviceIndex = state.account.services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.accounts[accIndex].services[serviceIndex].paid = true;
+      state.account.services[serviceIndex].paid = true;
     },
     unPay(state, action) {
-      const { acc, service } = action.payload;
-      const accIndex = state.accounts.findIndex(
-        (account) => account._id.toString() === acc
-      );
-      const serviceIndex = state.accounts[accIndex].services.findIndex(
+      const { service } = action.payload;
+
+      const serviceIndex = state.account.services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.accounts[accIndex].services[serviceIndex].paid = false;
+      state.account.services[serviceIndex].paid = false;
     },
     removeAccountService(state, action) {
-      const { acc, service } = action.payload;
-      const accIndex = state.accounts.findIndex(
-        (account) => account._id.toString() === acc
-      );
-      const serviceIndex = state.accounts[accIndex].services.findIndex(
+      const { service } = action.payload;
+      const serviceIndex = state.account.services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.accounts[accIndex].services.splice(serviceIndex, 1);
+      state.account.services.splice(serviceIndex, 1);
     },
     sortServicesByDate(state, action) {
-      const { accNo, date } = action.payload;
-      const accountIndex = state.accounts.findIndex((acc) => acc._id === accNo);
+      const { date } = action.payload;
       switch (date) {
         case "asc":
-          state.accounts[accountIndex].services.sort(function (a, b) {
+          state.account.services.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa < bb ? -1 : aa > bb ? 1 : 0;
           });
           break;
         case "desc":
-          state.accounts[accountIndex].services.sort(function (a, b) {
+          state.account.services.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa > bb ? -1 : aa < bb ? 1 : 0;
@@ -186,33 +198,27 @@ const accountSlice = createSlice({
       }
     },
     sortServicesByPay(state, action) {
-      const { accNo, paid } = action.payload;
-      const accountIndex = state.accounts.findIndex((acc) => acc._id === accNo);
+      const { paid } = action.payload;
       switch (paid) {
         case "yes":
-          state.accounts[accountIndex].services.sort((a, b) =>
-            a.paid < b.paid ? 1 : -1
-          );
+          state.account.services.sort((a, b) => (a.paid < b.paid ? 1 : -1));
           break;
         case "no":
-          state.accounts[accountIndex].services.sort((a, b) =>
-            a.paid > b.paid ? 1 : -1
-          );
+          state.account.services.sort((a, b) => (a.paid > b.paid ? 1 : -1));
           break;
       }
     },
 
     setPrintAccount(state, action) {
-      const { accountId, index } = action.payload;
-      const account = state.accounts.find((acc) => acc._id === accountId);
-      state.printInfo.account = account;
-      state.printInfo.service = account.services[index];
+      const { index } = action.payload;
+      state.printInfo.account = state.account;
+      state.printInfo.service = state.account.services[index];
     },
 
     //entry actions
     recordField(state, action) {
-      const { field, accountIndex, value, index } = action.payload;
-      const account = state.accounts[accountIndex].entries[index];
+      const { field, value, index } = action.payload;
+      const account = state.account.entries[index];
 
       switch (field) {
         case "service":
@@ -268,9 +274,8 @@ const accountSlice = createSlice({
       }
     },
     newField(state, action) {
-      const { accountIndex } = action.payload;
       //this needs to be changed to the format of the new entry
-      state.accounts[accountIndex].entries.push({
+      state.account.entries.push({
         service: "",
         desc: "",
         qty: 1,
@@ -285,12 +290,12 @@ const accountSlice = createSlice({
       });
     },
     removeField(state, action) {
-      const { accountIndex, index } = action.payload;
-      state.accounts[accountIndex].entries.splice(index, 1);
+      const { index } = action.payload;
+      state.account.entries.splice(index, 1);
     },
     setQuickNote(state, action) {
-      const { type, accountIndex, value, index } = action.payload;
-      const account = state.accounts[accountIndex].entries[index];
+      const { type, value, index } = action.payload;
+      const account = state.account.entries[index];
       account.chartDate = account.date;
       switch (type) {
         case "service":
@@ -303,9 +308,7 @@ const accountSlice = createSlice({
     },
     clearEntries(state, action) {
       //this needs to be changed to the modal entry
-      const { accountIndex } = action.payload;
-
-      state.accounts[accountIndex].entries = [
+      state.account.entries = [
         {
           service: "",
           desc: "",
@@ -322,13 +325,16 @@ const accountSlice = createSlice({
     },
 
     noSalesTax(state, action) {
-      const { accountIndex, index } = action.payload;
-      const account = state.accounts[accountIndex].entries[index];
+      const { index } = action.payload;
+      const account = state.account.entries[index];
       account.tax = false;
       account.total = account.amount * account.qty;
     },
     setAccData(state, action) {
       state.accountStats = action.payload;
+    },
+    clearAccount(state, action) {
+      state.account = {};
     },
   },
 });

@@ -8,6 +8,7 @@ import {
   Legend,
 } from "chart.js";
 import { useSelector } from "react-redux";
+import { Text } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(
@@ -35,10 +36,10 @@ const EmployeeStats = () => {
     },
   };
 
-  const labels = employeeStats.map((data) =>
+  const labels = employeeStats?.map((data) =>
     data.x ? `${data.x.month + 1}-${data.x.date}-${data.x.year}` : ""
   );
-  const dataset = employeeStats.map((data) => (data.y ? data.y : ""));
+  const dataset = employeeStats?.map((data) => (data.y ? data.y : ""));
 
   const empData = {
     labels,

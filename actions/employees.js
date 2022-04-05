@@ -128,3 +128,31 @@ export const retrieveEmployeeData = (user, employee) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const retrieveEmployees = (user) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/employees/${user}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};
+
+export const retrieveEmployee = (slug, emp) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/employees/emp/${slug}/${emp}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};

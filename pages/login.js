@@ -56,30 +56,9 @@ const Login = () => {
         });
         setIsSubmitting(false);
       } else {
-        const newAccounts = data.accounts.map((acc) => {
-          return {
-            ...acc,
-            entries: acc.entries.map((ent) => {
-              if (ent.service === "" && ent.desc === "") {
-                return {
-                  ...ent,
-                  date: getDateByYear(),
-                };
-              } else {
-                return {
-                  ...ent,
-                };
-              }
-            }),
-          };
-        });
         dispatch(userActions.setUser(data.user));
-        dispatch(employeeActions.setEmployees(data.employees));
-        dispatch(accountActions.setAccounts(newAccounts));
-        dispatch(expenseActions.setAllExpenses(data.expenses));
+        console.log(data.taxes);
         dispatch(taxActions.setTax(data.taxes));
-
-        // dispatch(cartActions.setCart(data.user.cart));
         toast({
           title: `We've missed you, ${data.user.firstName}!`,
           description: `Welcome back`,
@@ -184,12 +163,12 @@ const Login = () => {
                   </Stack>
                   <Button
                     size={"sm"}
-                    bg={process.env.NEXT_PUBLIC_BTN}
+                    bg={"btn.100"}
                     _hover={{
-                      bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                      bg: "btn_hover.100",
                     }}
                     _active={{
-                      bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                      bg: "btn_hover.100",
                     }}
                     _focus={{ boxShadow: "none" }}
                     color={"#fff"}

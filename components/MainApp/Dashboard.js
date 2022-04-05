@@ -134,7 +134,7 @@ const Dashboard = ({ pieDashData, lineDashData }) => {
                             }}
                             variant={"ghost"}
                             _hover={{
-                              bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                              bg: "btn_hover.100",
                               color: "#fff",
                             }}
                             _active={{
@@ -159,8 +159,12 @@ const Dashboard = ({ pieDashData, lineDashData }) => {
                     entry.service === "" && entry.desc === "" ? (
                       ""
                     ) : index === 0 ? (
-                      <Link href={`/${user.slug}/account/${acc._id}`}>
+                      <Link
+                        href={`/${user.slug}/account/${acc._id}`}
+                        key={index}
+                      >
                         <Text
+                          key={index}
                           cursor={"pointer"}
                           _hover={{
                             bg: "",

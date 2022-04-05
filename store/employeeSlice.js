@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getDateByYear } from "../utils/helpers";
+import lodash from "lodash";
 
 const employeeState = {
   employees: [],
+  employee: {},
   employeeStats: [],
   wage: false,
 };
@@ -12,6 +15,10 @@ const employeeSlice = createSlice({
   reducers: {
     setEmployees(state, action) {
       state.employees = action.payload;
+    },
+    setEmployee(state, action) {
+      state.employee = action.payload;
+      state.employee.pay.date = getDateByYear();
     },
     addEmployee(state, action) {
       state.employees.unshift(action.payload);
@@ -28,35 +35,35 @@ const employeeSlice = createSlice({
 
       switch (field) {
         case "date":
-          state.employees[index].pay.date = value;
+          state.employee.pay.date = value;
           break;
         case "hours":
-          if (state.employees[index].pay.hourlyWage === 0) {
-            state.employees[index].pay.hours = parseInt(value);
-            state.employees[index].pay.total =
-              parseInt(value) * state.employees[index].pay.wage;
+          if (state.employee.pay.hourlyWage === 0) {
+            state.employee.pay.hours = parseFloat(value);
+            state.employee.pay.total =
+              parseFloat(value) * state.employee.pay.wage;
           } else {
-            state.employees[index].pay.hours = parseInt(value);
-            state.employees[index].pay.total =
-              parseInt(value) * state.employees[index].pay.hourlyWage;
+            state.employee.pay.hours = parseFloat(value);
+            state.employee.pay.total =
+              parseFloat(value) * state.employee.pay.hourlyWage;
           }
           break;
         case "amount":
           state.wage = false;
-          state.employees[index].pay.hourlyWage = 0;
-          state.employees[index].pay.wage = parseFloat(value);
-          state.employees[index].pay.total =
-            parseFloat(value) * state.employees[index].pay.hours;
+          state.employee.pay.hourlyWage = 0;
+          state.employee.pay.wage = parseFloat(value);
+          state.employee.pay.total =
+            parseFloat(value) * state.employee.pay.hours;
           break;
         case "hourlyWage":
           state.wage = true;
-          state.employees[index].pay.wage = 0;
-          if (state.employees[index].pay.hours === 0) {
-            state.employees[index].pay.hourlyWage = parseFloat(value);
+          state.employee.pay.wage = 0;
+          if (state.employee.pay.hours === 0) {
+            state.employee.pay.hourlyWage = parseFloat(value);
           } else {
-            state.employees[index].pay.hourlyWage = parseFloat(value);
-            state.employees[index].pay.total =
-              parseFloat(value) * state.employees[index].pay.hours;
+            state.employee.pay.hourlyWage = parseFloat(value);
+            state.employee.pay.total =
+              parseFloat(value) * state.employee.pay.hours;
           }
           break;
       }
@@ -150,19 +157,18 @@ const employeeSlice = createSlice({
       }
     },
     sortEntriesByDate(state, action) {
-      const { empNo, date } = action.payload;
-      const empIndex = state.employees.findIndex((emp) => emp._id === empNo);
+      const { date } = action.payload;
 
       switch (date) {
         case "asc":
-          state.employees[empIndex].paidEntries.sort(function (a, b) {
+          state.employee.paidEntries.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa < bb ? -1 : aa > bb ? 1 : 0;
           });
           break;
         case "desc":
-          state.employees[empIndex].paidEntries.sort(function (a, b) {
+          state.employee.paidEntries.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa > bb ? -1 : aa < bb ? 1 : 0;
@@ -171,38 +177,27 @@ const employeeSlice = createSlice({
       }
     },
     recordPaidEntry(state, action) {
-      let date = new Date();
-      let day = `${date.getDate()}`.padStart(2, "0");
-      let month = `${date.getMonth() + 1}`.padStart(2, "0");
-      let year = date.getFullYear();
-
-      let newDate = `${year}-${month}-${day}`;
-      const { entry, index, wage } = action.payload;
+      const { entry, wage } = action.payload;
       if (wage) {
-        state.employees[index].paidEntries.unshift(entry);
-        state.employees[index].pay.hours = 0;
-        state.employees[index].pay.total = 0;
-        state.employees[index].pay.date = newDate;
+        state.employee.paidEntries.unshift(entry);
+        state.employee.pay.hours = 0;
+        state.employee.pay.total = 0;
+        state.employee.pay.date = getDateByYear();
       } else {
-        state.employees[index].paidEntries.unshift(entry);
-        state.employees[index].pay.hours = 0;
-        state.employees[index].pay.total = 0;
-        state.employees[index].pay.date = newDate;
+        state.employee.paidEntries.unshift(entry);
+        state.employee.pay.hours = 0;
+        state.employee.pay.total = 0;
+        state.employee.pay.date = getDateByYear();
       }
     },
 
     removeAccountService(state, action) {
-      const { empNo, entryId } = action.payload;
-
-      const empIndex = state.employees.findIndex(
-        (emp) => emp._id.toString() === empNo
-      );
-
-      const entryIndex = state.employees[empIndex].paidEntries.findIndex(
+      const { entryId } = action.payload;
+      const entryIndex = state.employee.paidEntries.findIndex(
         (emp) => emp._id.toString() === entryId
       );
 
-      state.employees[empIndex].paidEntries.splice(entryIndex, 1);
+      state.employee.paidEntries.splice(entryIndex, 1);
     },
     setEmpData(state, action) {
       state.employeeStats = action.payload;

@@ -163,12 +163,12 @@ const Profile = () => {
               value={companyName}
             />
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -188,12 +188,12 @@ const Profile = () => {
               value={firstName}
             />
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -213,12 +213,12 @@ const Profile = () => {
               value={lastName}
             />
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -238,12 +238,12 @@ const Profile = () => {
               value={email}
             />
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -276,12 +276,12 @@ const Profile = () => {
             </InputGroup>
 
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}

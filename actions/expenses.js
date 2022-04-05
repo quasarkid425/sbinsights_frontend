@@ -52,6 +52,20 @@ export const removeExpense = (user, expenses, index) => {
     .catch((err) => console.log(err));
 };
 
+export const retrieveExpenses = (user) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/expenses/${user}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};
+
 export const retrieveExpenseData = (user) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/expenses/expData/${user}`, {
     method: "GET",

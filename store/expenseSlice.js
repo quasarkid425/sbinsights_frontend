@@ -1,17 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-let date = new Date();
-let day = `${date.getDate()}`.padStart(2, "0");
-let month = `${date.getMonth() + 1}`.padStart(2, "0");
-let year = date.getFullYear();
-
-let newDate = `${year}-${month}-${day}`;
+import { getDateByYear } from "../utils/helpers";
 
 const expenseState = {
   expenses: [],
   expenseStats: [],
   expense: {
-    date: newDate,
+    date: getDateByYear(),
     amount: 0,
     desc: "",
   },
@@ -33,10 +27,10 @@ const expenseSlice = createSlice({
       state.expenses = action.payload;
     },
     setAllExpenses(state, action) {
-      const { expenses, quickExpAmount, quickExpDesc } = action.payload;
+      const { expenses, exp } = action.payload;
       state.expenses = expenses;
-      state.quickExpenses.amount = quickExpAmount;
-      state.quickExpenses.desc = quickExpDesc;
+      state.quickExpenses.amount = exp.quickExpAmount;
+      state.quickExpenses.desc = exp.quickExpDesc;
     },
     setAmount(state, action) {
       state.expense.amount = action.payload;
@@ -48,7 +42,7 @@ const expenseSlice = createSlice({
     clearFields(state, action) {
       state.expense.desc = "";
       state.expense.amount = 0;
-      state.expense.date = newDate;
+      state.expense.date = getDateByYear();
     },
     addToExpenses(state, action) {
       const { date, amount, desc } = action.payload;

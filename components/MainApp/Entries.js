@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Tooltip,
   Flex,
@@ -31,50 +31,39 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import {
-  IoIosAdd,
-  IoIosCheckmark,
-  IoIosClose,
-  IoIosAddCircleOutline,
-} from "react-icons/io";
+import { IoIosAdd, IoIosClose, IoIosAddCircleOutline } from "react-icons/io";
 import { BsArrowUp } from "react-icons/bs";
 import { FiDollarSign } from "react-icons/fi";
 import { IoIosCheckboxOutline, IoIosCheckbox } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
-import { userActions } from "../../store/userSlice";
 import { accountActions } from "../../store/accountSlice";
 import { taxActions } from "../../store/taxSlice";
-import { updateQuickNotes } from "../../actions/users";
 import { submitServiceEntry, saveEntries } from "../../actions/entries";
-import { retrieveAccountData } from "../../actions/accounts";
-import { setUpTaxes } from "../../actions/taxes";
+import { retrieveAccountData, retrieveAccount } from "../../actions/accounts";
 import { useRouter } from "next/router";
 import { numberArray, getDateByMonth } from "../../utils/helpers";
 import { v4 as uuidv4 } from "uuid";
+import QuickNotes from "./accounts/modals/QuickNotes";
+import Tax from "./accounts/modals/Tax";
 
 const Entries = ({ historyRef }) => {
+  const router = useRouter();
+  const { company: slug, accNo } = router.query;
+  const dispatch = useDispatch();
+  const { account } = useSelector((state) => state.accounts);
+
   const { accounts } = useSelector((state) => state.accounts);
   const { taxes, selectedStates } = useSelector((state) => state.taxes);
   const { user } = useSelector((state) => state.user);
+  const [isLoading, setIsLoading] = useState(false);
   const [option, setOption] = useState("service");
   const [serviceIndex, setServiceIndex] = useState(0);
   const [descIndex, setDescIndex] = useState(0);
   const [quickService, setQuickService] = useState("");
   const [quickDesc, setQuickDesc] = useState("");
   const [error, setError] = useState(false);
-  const router = useRouter();
   const toast = useToast();
-  const dispatch = useDispatch();
-  const account = accounts?.find(
-    (acc) => acc._id.toString() === router.query.accNo
-  );
   const accountIndex = accounts?.findIndex((acc) => acc._id === account?._id);
-
-  const {
-    isOpen: isQuickNoteOpen,
-    onOpen: onQuickNoteOpen,
-    onClose: onQuickNoteClose,
-  } = useDisclosure();
 
   const {
     isOpen: isQuickOpen,
@@ -82,24 +71,13 @@ const Entries = ({ historyRef }) => {
     onClose: onQuickClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isTaxOpen,
-    onOpen: onTaxOpen,
-    onClose: onTaxClose,
-  } = useDisclosure();
-
-  const totalPrice = account?.entries.reduce((total, item) => {
+  const totalPrice = account?.entries?.reduce((total, item) => {
     return total + item.total;
   }, 0);
 
-  const saveQuickNotesHandler = async () => {
-    await updateQuickNotes(user);
-    onQuickNoteClose();
-  };
-
   const recordHandler = async () => {
     let flag = false;
-    account?.entries.forEach((entry) => {
+    account?.entries?.forEach((entry) => {
       if (entry.service === "" && entry.desc === "") {
         flag = true;
       }
@@ -119,20 +97,15 @@ const Entries = ({ historyRef }) => {
         chartDate: getDateByMonth(),
       };
 
-      await submitServiceEntry(user._id, router.query.accNo, entry);
+      await submitServiceEntry(user._id, accNo, entry);
 
-      dispatch(
-        accountActions.addServices({ accNo: router.query.accNo, entry })
-      );
+      dispatch(accountActions.addServices({ entry }));
 
       historyRef.current.click();
 
-      dispatch(accountActions.clearEntries({ accountIndex }));
+      dispatch(accountActions.clearEntries());
 
-      const data = await retrieveAccountData(
-        router.query.company,
-        router.query.accNo
-      );
+      const data = await retrieveAccountData(slug, accNo);
       dispatch(accountActions.setAccData(data));
 
       setError(false);
@@ -149,7 +122,7 @@ const Entries = ({ historyRef }) => {
 
   const saveHandler = async () => {
     let flag = false;
-    account?.entries.forEach((entry) => {
+    account?.entries?.forEach((entry) => {
       if (entry.service === "" && entry.desc === "") {
         flag = true;
       }
@@ -158,7 +131,7 @@ const Entries = ({ historyRef }) => {
     if (flag) {
       setError(true);
     } else {
-      await saveEntries(user._id, router.query.accNo, account?.entries);
+      await saveEntries(user._id, accNo, account?.entries);
       setError(false);
       toast({
         description: "Saved successfully",
@@ -170,19 +143,15 @@ const Entries = ({ historyRef }) => {
     }
   };
 
-  const setUpTaxHandler = async () => {
-    if (selectedStates.length === 0) {
-      onTaxClose();
-      return;
-    } else {
-      //set the taxSetUp the true
-      dispatch(taxActions.setUpTax());
-      //save the selected states to the db
-      await setUpTaxes(user._id, taxes.taxStates, selectedStates);
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, taxData } = await retrieveAccount(slug, accNo);
+      dispatch(accountActions.setAccount({ account: data }));
+      dispatch(taxActions.setTax(taxData));
+    };
 
-      onTaxClose();
-    }
-  };
+    fetchData().catch(console.error);
+  }, []);
 
   return (
     <>
@@ -206,136 +175,7 @@ const Entries = ({ historyRef }) => {
           />
         </Alert>
       )}
-      <Modal
-        isOpen={isQuickNoteOpen}
-        onClose={onQuickNoteClose}
-        size={"xl"}
-        scrollBehavior={"inside"}
-      >
-        {/* Quick Notes Modal */}
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader fontSize={"md"}>Set Quick Notes</ModalHeader>
-          <ModalCloseButton _focus={{ boxShadow: "none" }} />
-          <ModalBody>
-            <Text fontWeight={"semibold"} fontSize={"sm"}>
-              Product / Service
-            </Text>
-            {user.quickServices?.length === 0 ? (
-              <Flex align={"center"} gap={"3rem"} mb={"1rem"}>
-                <Text fontSize={"sm"}>
-                  No quick notes for Product / Services - click the plus to set
-                  up
-                </Text>
-                <IoIosAdd
-                  size={25}
-                  cursor={"pointer"}
-                  onClick={() => {
-                    dispatch(userActions.addFirstService());
-                  }}
-                />
-              </Flex>
-            ) : (
-              user.quickServices?.map((service, index) => (
-                <Flex>
-                  <Input
-                    mb={"1rem"}
-                    size={"sm"}
-                    placeholder={service === "" ? service : ""}
-                    value={service}
-                    onChange={(e) => {
-                      dispatch(
-                        userActions.updateService({
-                          type: "service",
-                          index,
-                          value: e.target.value,
-                        })
-                      );
-                    }}
-                  />
-                  <IoIosCheckmark
-                    size={35}
-                    cursor={"pointer"}
-                    onClick={() => {
-                      dispatch(userActions.addService(index));
-                    }}
-                  />
-                  <IoIosClose
-                    size={35}
-                    onClick={() => {
-                      dispatch(userActions.removeService(index));
-                    }}
-                    cursor={"pointer"}
-                  />
-                </Flex>
-              ))
-            )}
-            <Text fontWeight={"semibold"} fontSize={"sm"}>
-              Descriptions
-            </Text>
-            {user.quickDescriptions?.length === 0 ? (
-              <Flex align={"center"} gap={"3rem"}>
-                <Text fontSize={"sm"}>
-                  No quick notes for Descriptions - click the plus to set up
-                </Text>
-                <IoIosAdd
-                  size={25}
-                  cursor={"pointer"}
-                  onClick={() => {
-                    dispatch(userActions.addFirstDescription());
-                  }}
-                />
-              </Flex>
-            ) : (
-              user.quickDescriptions?.map((desc, index) => (
-                <Flex align={"center"}>
-                  <Input
-                    size={"sm"}
-                    placeholder={desc === "" ? desc : ""}
-                    value={desc}
-                    onChange={(e) => {
-                      dispatch(
-                        userActions.updateService({
-                          type: "description",
-                          index,
-                          value: e.target.value,
-                        })
-                      );
-                    }}
-                  />
-                  <IoIosCheckmark
-                    size={35}
-                    cursor={"pointer"}
-                    onClick={() => {
-                      dispatch(userActions.addDescription(index));
-                    }}
-                  />
-                  <IoIosClose
-                    size={35}
-                    onClick={() => {
-                      dispatch(userActions.removeDescription(index));
-                    }}
-                    cursor={"pointer"}
-                  />
-                </Flex>
-              ))
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={onQuickNoteClose}
-              size={"sm"}
-            >
-              Close
-            </Button>
-            <Button onClick={saveQuickNotesHandler} size={"sm"}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {/* Quick Notes Modal */}
 
       {/* Add Quick Product / Desc Modal */}
       <Modal isOpen={isQuickOpen} onClose={onQuickClose}>
@@ -352,9 +192,10 @@ const Entries = ({ historyRef }) => {
                 ? "Product / Service quick notes are not set up yet - Click the 'Quick Notes' icon in the top right to set up"
                 : user?.quickServices?.map((service, index) => (
                     <Input
+                      key={index}
                       size={"sm"}
                       placeholder={service}
-                      my={".5rem"}
+                      mb={".5rem"}
                       cursor={"pointer"}
                       style={{
                         color: "transparent",
@@ -365,11 +206,12 @@ const Entries = ({ historyRef }) => {
                   ))
               : user?.quickDescriptions?.length === 0
               ? "Description quick notes are not set up yet - Click the 'Quick Notes' icon in the top right to set up"
-              : user?.quickDescriptions?.map((service) => (
+              : user?.quickDescriptions?.map((service, index) => (
                   <Input
+                    key={index}
                     size={"sm"}
                     placeholder={service}
-                    my={".5rem"}
+                    mb={".5rem"}
                     cursor={"pointer"}
                     style={{
                       color: "transparent",
@@ -396,7 +238,6 @@ const Entries = ({ historyRef }) => {
                   ? dispatch(
                       accountActions.setQuickNote({
                         type: "service",
-                        accountIndex,
                         index: serviceIndex,
                         value: quickService,
                       })
@@ -404,7 +245,6 @@ const Entries = ({ historyRef }) => {
                   : dispatch(
                       accountActions.setQuickNote({
                         type: "desc",
-                        accountIndex,
                         index: descIndex,
                         value: quickDesc,
                       })
@@ -419,101 +259,11 @@ const Entries = ({ historyRef }) => {
       </Modal>
 
       {/* Tax Modal */}
-      <Modal
-        isOpen={isTaxOpen}
-        onClose={onTaxClose}
-        size={"xl"}
-        scrollBehavior={"inside"}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader fontSize={"md"}>Sales Taxes</ModalHeader>
-          <ModalCloseButton _focus={{ boxShadow: "none" }} />
-          <ModalBody>
-            <Flex direction={"column"}>
-              <Text mb={".75rem"} fontSize={"sm"}>
-                Select the states below by clicking on the states you will be
-                adding sales tax to the most when billing customers, click the
-                'x' to deselect:
-              </Text>
-              {taxes.taxStates.map((state, index) => (
-                <Flex align={"center"}>
-                  <Box
-                    _hover={{ bg: "gray.200" }}
-                    fontSize={"sm"}
-                    w={"98%"}
-                    border={
-                      state.selected
-                        ? "2px solid #00938E"
-                        : "1px solid lightgray"
-                    }
-                    borderRadius={".3rem"}
-                    p={2}
-                    my={".5rem"}
-                    cursor={"pointer"}
-                    onClick={() =>
-                      dispatch(
-                        taxActions.addQuickStates({
-                          index,
-                          abbrevation: state.abbrevation,
-                        })
-                      )
-                    }
-                  >
-                    {state.name}
-                  </Box>
-                  <IoIosClose
-                    className="icon"
-                    size={35}
-                    cursor={"pointer"}
-                    color={"gray"}
-                    onClick={() =>
-                      dispatch(
-                        taxActions.removeQuickStates({
-                          index,
-                          abbrevation: state.abbrevation,
-                        })
-                      )
-                    }
-                  />
-                </Flex>
-              ))}
-            </Flex>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onTaxClose} size={"sm"}>
-              Close
-            </Button>
-            <Button onClick={setUpTaxHandler} size={"sm"}>
-              Set up
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       <Flex justify="end" w={"100%"} gap={"1rem"} align={"center"}>
-        {taxes.taxSetUp && (
-          <Tooltip label="Quick Notes" fontSize="md">
-            <span>
-              <IoIosAdd
-                size={25}
-                cursor={"pointer"}
-                onClick={onQuickNoteOpen}
-              />
-            </span>
-          </Tooltip>
-        )}
+        {taxes.taxSetUp && <QuickNotes />}
 
-        <Tooltip label="Tax" fontSize="md">
-          <span>
-            <FiDollarSign
-              size={taxes.taxSetUp ? 15 : 40}
-              cursor={"pointer"}
-              onClick={onTaxOpen}
-            />
-          </span>
-        </Tooltip>
+        <Tax />
       </Flex>
       {taxes.taxSetUp ? (
         <>
@@ -524,9 +274,9 @@ const Entries = ({ historyRef }) => {
             fontWeight={"semibold"}
             justifyContent={"center"}
           >
-            {account?.entries.map((entry, index) => (
+            {account?.entries?.map((entry, index) => (
               <>
-                <GridItem colSpan={{ base: "2", md: "1", lg: "1" }}>
+                <GridItem colSpan={{ base: "2", md: "1", lg: "1" }} key={index}>
                   {index === 0 && (
                     <Heading
                       fontSize={"sm"}
@@ -546,9 +296,8 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "service",
-                            accountIndex,
-                            index,
                             value: e.target.value,
+                            index,
                           })
                         );
                       }}
@@ -589,7 +338,6 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "description",
-                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -632,7 +380,6 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "qty",
-                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -640,8 +387,8 @@ const Entries = ({ historyRef }) => {
                       }}
                       value={entry.qty}
                     >
-                      {numberArray.map((num) => (
-                        <option value={num} key={num}>
+                      {numberArray.map((num, index) => (
+                        <option value={num} key={index}>
                           {num}
                         </option>
                       ))}
@@ -668,7 +415,6 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "amount",
-                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -716,14 +462,14 @@ const Entries = ({ historyRef }) => {
                         />
 
                         <MenuList fontSize={"sm"}>
-                          {selectedStates.map((state) => (
+                          {selectedStates.map((state, index) => (
                             <MenuItem
+                              key={index}
                               _hover={{ bg: "gray.200" }}
                               onClick={() =>
                                 dispatch(
                                   accountActions.recordField({
                                     field: "tax",
-                                    accountIndex,
                                     index: index,
                                     value: state,
                                   })
@@ -739,7 +485,6 @@ const Entries = ({ historyRef }) => {
                               onClick={() =>
                                 dispatch(
                                   accountActions.noSalesTax({
-                                    accountIndex,
                                     index,
                                   })
                                 )
@@ -853,12 +598,12 @@ const Entries = ({ historyRef }) => {
             <Button
               size={"sm"}
               width={"15%"}
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -869,12 +614,12 @@ const Entries = ({ historyRef }) => {
             <Button
               size={"sm"}
               width={"15%"}
-              bg={process.env.NEXT_PUBLIC_BTN_2}
+              bg={"btn.200"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#000"}

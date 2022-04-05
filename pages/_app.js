@@ -10,6 +10,7 @@ import { persistStore } from "redux-persist";
 import { motion, AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import * as gtag from "../lib/gtag";
+import { theme } from "../styles/theme";
 
 let persistor = persistStore(store);
 
@@ -32,7 +33,7 @@ function MyApp({ Component, pageProps, router }) {
       </Head>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ChakraProvider>
+          <ChakraProvider theme={theme}>
             <Layout>
               {/* <AnimatePresence>
                 <motion.div

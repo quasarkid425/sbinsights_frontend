@@ -39,9 +39,7 @@ const PayHistory = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { company, empNo } = useRouter().query;
 
-  const empIndex = employees.findIndex((emp) => emp._id === empNo);
-
-  const employee = employees[empIndex];
+  const { employee } = useSelector((state) => state.employees);
 
   const removeEntryHandler = async () => {
     //Remove from account state
@@ -53,9 +51,8 @@ const PayHistory = () => {
       })
     );
     //Remove from services database
-    const empIndex = employees.findIndex((emp) => emp._id.toString() === empNo);
 
-    const entryIndex = employees[empIndex].paidEntries?.findIndex(
+    const entryIndex = employee.paidEntries?.findIndex(
       (emp) => emp._id.toString() === entryId
     );
 
@@ -63,7 +60,7 @@ const PayHistory = () => {
       user._id,
       empNo,
       entryId,
-      employees[empIndex].paidEntries,
+      employee.paidEntries,
       entryIndex
     );
 
@@ -76,10 +73,10 @@ const PayHistory = () => {
 
   const sortByDate = () => {
     if (date === "asc") {
-      dispatch(employeeActions.sortEntriesByDate({ empNo, date }));
+      dispatch(employeeActions.sortEntriesByDate({ date }));
       setDate("desc");
     } else {
-      dispatch(employeeActions.sortEntriesByDate({ empNo, date }));
+      dispatch(employeeActions.sortEntriesByDate({ date }));
       setDate("asc");
     }
   };
@@ -172,8 +169,8 @@ const PayHistory = () => {
         {employee?.paidEntries?.length === 0 ? (
           <Text fontSize={"sm"}>No History</Text>
         ) : (
-          employee?.paidEntries?.map((emp) => (
-            <AccordionItem>
+          employee?.paidEntries?.map((emp, index) => (
+            <AccordionItem key={index}>
               <h2>
                 <Flex align={"center"}>
                   <AccordionButton _focus={{ boxShadow: "none" }}>

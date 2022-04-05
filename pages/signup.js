@@ -65,9 +65,6 @@ const SignUp = () => {
         return;
       } else {
         dispatch(userActions.setUser(data.newUser));
-        dispatch(employeeActions.setEmployees(data.employees));
-        dispatch(accountActions.setAccounts(data.accounts));
-        dispatch(expenseActions.setAllExpenses(data.expenses));
         dispatch(taxActions.setTax(data.taxes));
         toast({
           title: "Account created.",
@@ -189,12 +186,12 @@ const SignUp = () => {
                 <Stack spacing={4}>
                   <Button
                     size={"sm"}
-                    bg={process.env.NEXT_PUBLIC_BTN}
+                    bg={"btn.100"}
                     _hover={{
-                      bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                      bg: "btn_hover.100",
                     }}
                     _active={{
-                      bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                      bg: "btn_hover.100",
                     }}
                     _focus={{ boxShadow: "none" }}
                     color={"#fff"}

@@ -238,3 +238,31 @@ export const chartData = (user, type) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const retrieveAccounts = (user) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/${user}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};
+
+export const retrieveAccount = (slug, acc) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/acc/${slug}/${acc}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};

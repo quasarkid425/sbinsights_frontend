@@ -37,12 +37,12 @@ import {
 } from "@chakra-ui/react";
 import { BsArrowUp, BsSortAlphaDown, BsSortAlphaUpAlt } from "react-icons/bs";
 import { SearchIcon } from "@chakra-ui/icons";
-import { expenseActions } from "../../store/expenseSlice";
 import {
   addExpense,
   updateQuickExps,
   removeExpense,
   retrieveExpenseData,
+  retrieveExpenses,
 } from "../../actions/expenses";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -52,13 +52,18 @@ import {
   IoIosAddCircleOutline,
   IoIosStats,
 } from "react-icons/io";
-import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { getDateByYear } from "../../utils/helpers";
+import { expenseActions } from "../../store/expenseSlice";
+
 const Expenses = () => {
+  const { user } = useSelector((state) => state.user);
+  const { expenses, quickExpenses, expense } = useSelector(
+    (state) => state.expenses
+  );
+  const dispatch = useDispatch();
   const [amountError, setAmountError] = useState(false);
   const [descError, setDescError] = useState(false);
-  const { user } = useSelector((state) => state.user);
   const { company } = useRouter().query;
 
   const {
@@ -82,11 +87,7 @@ const Expenses = () => {
     onOpen: onStatsOpen,
     onClose: onStatsClose,
   } = useDisclosure();
-  const dispatch = useDispatch();
   const { colorMode, toggleColorMode } = useColorMode();
-  const { expenses, expense, quickExpenses } = useSelector(
-    (state) => state.expenses
-  );
   const headings = ["Date", "Amount", "Description"];
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -143,8 +144,11 @@ const Expenses = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await retrieveExpenseData(company);
-      dispatch(expenseActions.setExpData(data));
+      const { data } = await retrieveExpenses(user._id);
+      dispatch(expenseActions.setAllExpenses(data));
+
+      const stats = await retrieveExpenseData(company);
+      dispatch(expenseActions.setExpData(stats));
     };
 
     fetchData().catch(console.error);
@@ -221,12 +225,13 @@ const Expenses = () => {
                     <MenuList fontSize={"sm"}>
                       {quickExpenses.amount.length === 0 ? (
                         <Text textAlign={"center"} p={3}>
-                          No amount quick note set up
+                          No quick notes set up for amount yet
                         </Text>
                       ) : (
                         <>
-                          {quickExpenses.amount.map((amt) => (
+                          {quickExpenses.amount.map((amt, index) => (
                             <MenuItem
+                              key={index}
                               onClick={() =>
                                 dispatch(expenseActions.quickAmt(amt))
                               }
@@ -272,12 +277,13 @@ const Expenses = () => {
                     <MenuList fontSize={"sm"}>
                       {quickExpenses.desc.length === 0 ? (
                         <Text textAlign={"center"} p={3}>
-                          No description quick note set up
+                          No quick notes set up for description yet
                         </Text>
                       ) : (
                         <>
-                          {quickExpenses.desc.map((desc) => (
+                          {quickExpenses.desc.map((desc, index) => (
                             <MenuItem
+                              key={index}
                               onClick={() =>
                                 dispatch(expenseActions.quickDesc(desc))
                               }
@@ -320,7 +326,7 @@ const Expenses = () => {
       </Modal>
 
       {/* Edit Expense Modal */}
-      <Modal onClose={onEditClose} size={"xl"} isOpen={isEditOpen}>
+      <Modal onClose={onEditClose} isOpen={isEditOpen}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader fontSize={"sm"}>Remove Expense</ModalHeader>
@@ -379,10 +385,10 @@ const Expenses = () => {
       <Modal onClose={onQuickAddClose} size={"xl"} isOpen={isQuickAddOpen}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontSize={"md"}>Add Quick Expense</ModalHeader>
+          <ModalHeader fontSize={"md"}>Set Quick Expense</ModalHeader>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <ModalBody>
-            <Text fontWeight={"semibold"} fontSize={"sm"}>
+            <Text fontWeight={"semibold"} fontSize={"sm"} mb={".2rem"}>
               Amount
             </Text>
             {quickExpenses.amount?.length === 0 ? (
@@ -401,9 +407,9 @@ const Expenses = () => {
             ) : (
               quickExpenses.amount?.map((amt, index) => (
                 <>
-                  <Flex>
+                  <Flex key={index}>
                     <Input
-                      mb={"1rem"}
+                      mb={".5rem"}
                       size={"sm"}
                       placeholder={amt === "" ? amt : ""}
                       value={amt}
@@ -435,11 +441,11 @@ const Expenses = () => {
                 </>
               ))
             )}
-            <Text fontWeight={"semibold"} fontSize={"sm"}>
+            <Text fontWeight={"semibold"} fontSize={"sm"} mb={".2rem"}>
               Description
             </Text>
             {quickExpenses.desc?.length === 0 ? (
-              <Flex align={"center"} gap={"3rem"}>
+              <Flex align={"center"} gap={"3rem"} mb={"1rem"}>
                 <Text fontSize={"sm"}>
                   No quick notes for Descriptions - click the plus to set up
                 </Text>
@@ -454,8 +460,9 @@ const Expenses = () => {
             ) : (
               quickExpenses.desc?.map((desc, index) => (
                 <>
-                  <Flex align={"center"}>
+                  <Flex align={"center"} key={index}>
                     <Input
+                      mb={".5rem"}
                       placeholder={desc === "" ? desc : ""}
                       value={desc}
                       onChange={(e) => {
@@ -535,12 +542,12 @@ const Expenses = () => {
         >
           <Flex gap={"1rem"} align={"center"}>
             <Button
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -613,8 +620,8 @@ const Expenses = () => {
           <Table variant={"simple"} fontSize={"sm"}>
             <Thead>
               <Tr>
-                {headings.map((heading) => (
-                  <Th key={heading}>
+                {headings.map((heading, index) => (
+                  <Th key={index}>
                     <Flex align={"center"} gap={"1rem"}>
                       <Box fontSize={".75rem"}>{heading}</Box>
                       <Flex>
@@ -643,28 +650,14 @@ const Expenses = () => {
                   if (searchTerm === "") {
                     return expense;
                   } else if (
-                    expense.empFullName
+                    expense.date
                       .toLowerCase()
                       .includes(searchTerm.toLowerCase()) ||
-                    expense.empPhoneNumber
+                    expense.amount
+                      .toString()
                       .toLowerCase()
                       .includes(searchTerm.toLowerCase()) ||
-                    expense.empEmail
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    expense.empGender
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    expense.empAddress.empStreet
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    expense.empAddress.empCity
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    expense.empAddress.empState
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    expense.empAddress.empZipCode
+                    expense.desc
                       .toLowerCase()
                       .includes(searchTerm.toLowerCase())
                   ) {
@@ -673,14 +666,14 @@ const Expenses = () => {
                 })
                 .map((expense, index) => (
                   <Tr
+                    key={index}
                     _hover={{
                       color: colorMode === "light" ? "gray.800" : "gray.800",
                       bg: "gray.200",
                     }}
-                    cursor={"pointer"}
                   >
                     <Td>{expense.date}</Td>
-                    <Td>${expense.amount.toFixed(2)}</Td>
+                    <Td>${parseFloat(expense.amount).toFixed(2)}</Td>
                     <Td>{expense.desc}</Td>
 
                     <Flex align={"center"} gap={"1rem"} mt={".75rem"}>
@@ -692,6 +685,7 @@ const Expenses = () => {
                               setRemoveIndex(index);
                               onEditOpen();
                             }}
+                            cursor={"pointer"}
                           />
                         </span>
                       </Tooltip>

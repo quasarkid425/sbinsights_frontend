@@ -1,9 +1,7 @@
-import React, { useState, useRef } from "react";
-import { Box, Heading } from "@chakra-ui/react";
-import { useSelector, useDispatch } from "react-redux";
-import { addEmployee } from "../../actions/employees";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useState, useRef } from "react";
 import {
+  Box,
+  Heading,
   Table,
   Thead,
   Tbody,
@@ -31,12 +29,14 @@ import {
   Grid,
   Text,
 } from "@chakra-ui/react";
+import { v4 as uuidv4 } from "uuid";
 import { BsArrowUp, BsSortAlphaDown, BsSortAlphaUpAlt } from "react-icons/bs";
-import { BiSortAlt2 } from "react-icons/bi";
 import { SearchIcon } from "@chakra-ui/icons";
 import Link from "next/link";
+import { useSelector, useDispatch } from "react-redux";
 import { employeeActions } from "../../store/employeeSlice";
 import { selectState } from "../../utils/helpers";
+import { retrieveEmployees, addEmployee } from "../../actions/employees";
 
 const Employees = () => {
   const { user } = useSelector((state) => state.user);
@@ -109,6 +109,15 @@ const Employees = () => {
   const sortDesc = (type) => {
     dispatch(employeeActions.sortCollectionDesc(type));
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await retrieveEmployees(user._id);
+      dispatch(employeeActions.setEmployees(data));
+    };
+
+    fetchData().catch(console.error);
+  }, []);
 
   return (
     <>
@@ -198,12 +207,12 @@ const Employees = () => {
               w={"100%"}
               onClick={submitEmployeeDetails}
               mt={"1rem"}
-              bg={process.env.NEXT_PUBLIC_BTN}
+              bg={"btn.100"}
               _hover={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _active={{
-                bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                bg: "btn_hover.100",
               }}
               _focus={{ boxShadow: "none" }}
               color={"#fff"}
@@ -224,12 +233,12 @@ const Employees = () => {
           justifyContent={employees.length === 0 ? "center" : "space-between"}
         >
           <Button
-            bg={process.env.NEXT_PUBLIC_BTN}
+            bg={"btn.100"}
             _hover={{
-              bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+              bg: "btn_hover.100",
             }}
             _active={{
-              bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+              bg: "btn_hover.100",
             }}
             _focus={{ boxShadow: "none" }}
             color={"#fff"}
@@ -274,8 +283,8 @@ const Employees = () => {
           <Table variant={"simple"} fontSize={"sm"}>
             <Thead>
               <Tr>
-                {headings.map((heading) => (
-                  <Th key={heading}>
+                {headings.map((heading, index) => (
+                  <Th key={index}>
                     <Flex align={"center"} gap={2}>
                       <Box fontSize={".75rem"}>{heading}</Box>
                       <Flex gap={1}>
@@ -331,12 +340,13 @@ const Employees = () => {
                     return employee;
                   }
                 })
-                .map((employee) => (
+                .map((employee, index) => (
                   <Link
                     href={`/${user.slug}/employee/${employee._id}`}
                     key={uuidv4()}
                   >
                     <Tr
+                      key={index}
                       _hover={{
                         color: colorMode === "light" ? "gray.800" : "gray.800",
                         bg: "gray.200",

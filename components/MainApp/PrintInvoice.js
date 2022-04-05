@@ -26,12 +26,12 @@ const PrintInvoice = React.forwardRef((props, ref) => {
             <Heading size={"md"}>{user.companyName}</Heading>
             {/* Need to ask the user to fill out this */}
             <Stack>
-              <Text>{user.invoiceInfo.address}</Text>
+              <Text>{user.invoiceInfo?.address}</Text>
               <Text>
-                {user.invoiceInfo.city}, {user.invoiceInfo.state},{" "}
-                {user.invoiceInfo.zip}
+                {user.invoiceInfo?.city}, {user.invoiceInfo?.state},{" "}
+                {user.invoiceInfo?.zip}
               </Text>
-              <Text>{user.invoiceInfo.phone}</Text>
+              <Text>{user.invoiceInfo?.phone}</Text>
             </Stack>
           </Stack>
           <Stack>
@@ -50,8 +50,8 @@ const PrintInvoice = React.forwardRef((props, ref) => {
                 </Thead>
                 <Tbody>
                   <Tr>
-                    <Td textAlign={"center"}>{printInfo.service.date}</Td>
-                    <Td textAlign={"center"}>{printInfo.service._id}</Td>
+                    <Td textAlign={"center"}>{printInfo.service?.date}</Td>
+                    <Td textAlign={"center"}>{printInfo.service?._id}</Td>
                   </Tr>
                 </Tbody>
               </Table>
@@ -103,8 +103,8 @@ const PrintInvoice = React.forwardRef((props, ref) => {
               </Tr>
             </Thead>
             <Tbody>
-              {printInfo.service.services.map((acc) => (
-                <Tr>
+              {printInfo.service?.services?.map((acc, index) => (
+                <Tr key={index}>
                   <Td>{acc.qty}</Td>
                   <Td>{acc.desc}</Td>
                   <Td textAlign={"right"}>${acc.total.toFixed(2)}</Td>
@@ -122,10 +122,10 @@ const PrintInvoice = React.forwardRef((props, ref) => {
             mt={"2rem"}
           >
             <Flex justify={"space-between"}>
-              <Text>{user.invoiceInfo.signature}</Text>
+              <Text>{user.invoiceInfo?.signature}</Text>
               <Flex gap={"1rem"}>
                 <Text fontWeight={"semibold"}>Total:</Text>
-                <Box>${printInfo.service.total.toFixed(2)}</Box>
+                <Box>${printInfo.service?.total?.toFixed(2)}</Box>
               </Flex>
             </Flex>
           </Box>
@@ -134,7 +134,7 @@ const PrintInvoice = React.forwardRef((props, ref) => {
       <Box mt={"1rem"} pr={5}>
         <Flex justify={"end"} gap={"1rem"}>
           <Text fontWeight={"semibold"}>Balance Due:</Text>$
-          {printInfo.service.total.toFixed(2)}
+          {printInfo.service?.total?.toFixed(2)}
         </Flex>
       </Box>
       <Text

@@ -39,6 +39,7 @@ import { FiCornerDownLeft, FiShoppingCart } from "react-icons/fi";
 import { useSelector, useDispatch, RootStateOrAny } from "react-redux";
 import { userActions } from "../../store/userSlice";
 import { expenseActions } from "../../store/expenseSlice";
+import { accountActions } from "../../store/accountSlice";
 
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
@@ -54,11 +55,10 @@ export default function WithSubnavigation() {
   const router = useRouter();
 
   const signOutHandler = () => {
+    router.push("/login");
     dispatch(userActions.logout());
+    dispatch(accountActions.clearAccount(""));
     dispatch(expenseActions.clearExpenses(""));
-    // dispatch(cartActions.emptyCart({}));
-    // dispatch(shippingActions.clearShipping());
-    // dispatch(orderActions.removeOrder({}));
     toast({
       title: "Logged out successfully.",
       description: `See you soon, ${user.firstName}!`,
@@ -67,15 +67,6 @@ export default function WithSubnavigation() {
       duration: 3000,
       isClosable: true,
     });
-
-    // axios
-    //   .put(`${process.env.NEXT_PUBLIC_API}/users/saveCart`, {
-    //     cart,
-    //     user: user._id,
-    //   })
-    //   .then(({ data }) => {})
-    //   .catch((err) => {});
-    router.push("/login");
   };
 
   return (
@@ -309,12 +300,12 @@ export default function WithSubnavigation() {
                   display={{ base: "none", md: "inline-flex" }}
                   fontSize={"sm"}
                   fontWeight={600}
-                  bg={process.env.NEXT_PUBLIC_BTN}
+                  bg={"btn.100"}
                   _hover={{
-                    bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                    bg: "btn_hover.100",
                   }}
                   _active={{
-                    bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+                    bg: "btn_hover.100",
                   }}
                   _focus={{ boxShadow: "none" }}
                   color={"#fff"}

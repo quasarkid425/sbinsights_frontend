@@ -69,11 +69,10 @@ const History = ({ modifyRef }) => {
   const [paid, setPaid] = useState("yes");
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const { accounts } = useSelector((state) => state.accounts);
+  const { account } = useSelector((state) => state.accounts);
   const { printInfo } = useSelector((state) => state.accounts);
   const router = useRouter();
-  const { accNo } = router.query;
-  const account = accounts.find((acc) => acc._id === accNo);
+  const { company, accNo } = router.query;
   const toast = useToast();
   const {
     isOpen: isRemoveOpen,
@@ -90,69 +89,41 @@ const History = ({ modifyRef }) => {
   const componentRef = useRef();
 
   const payHandler = async (id) => {
-    dispatch(accountActions.pay({ acc: router.query.accNo, service: id }));
+    dispatch(accountActions.pay({ service: id }));
 
-    const accountIndex = accounts.findIndex(
-      (acc) => acc._id.toString() === router.query.accNo
-    );
-
-    const serviceIndex = accounts[accountIndex].services.findIndex(
+    const serviceIndex = account.services.findIndex(
       (acc) => acc._id.toString() === id
     );
 
-    await pay(
-      user._id,
-      router.query.accNo,
-      id,
-      accounts[accountIndex].services,
-      serviceIndex
-    );
+    await pay(user._id, accNo, id, account.services, serviceIndex);
   };
 
   const unPayHandler = async (id) => {
-    dispatch(accountActions.unPay({ acc: router.query.accNo, service: id }));
+    dispatch(accountActions.unPay({ service: id }));
 
-    const accountIndex = accounts.findIndex(
-      (acc) => acc._id.toString() === router.query.accNo
-    );
-
-    const serviceIndex = accounts[accountIndex].services.findIndex(
+    const serviceIndex = account.services.findIndex(
       (acc) => acc._id.toString() === id
     );
 
-    await unPay(
-      user._id,
-      router.query.accNo,
-      id,
-      accounts[accountIndex].services,
-      serviceIndex
-    );
+    await unPay(user._id, accNo, id, account.services, serviceIndex);
   };
 
   const sortByDate = () => {
     if (date === "asc") {
-      dispatch(
-        accountActions.sortServicesByDate({ accNo: router.query.accNo, date })
-      );
+      dispatch(accountActions.sortServicesByDate({ date }));
       setDate("desc");
     } else {
-      dispatch(
-        accountActions.sortServicesByDate({ accNo: router.query.accNo, date })
-      );
+      dispatch(accountActions.sortServicesByDate({ date }));
       setDate("asc");
     }
   };
 
   const sortByPay = () => {
     if (paid === "yes") {
-      dispatch(
-        accountActions.sortServicesByPay({ accNo: router.query.accNo, paid })
-      );
+      dispatch(accountActions.sortServicesByPay({ accNo, paid }));
       setPaid("no");
     } else {
-      dispatch(
-        accountActions.sortServicesByPay({ accNo: router.query.accNo, paid })
-      );
+      dispatch(accountActions.sortServicesByPay({ accNo, paid }));
       setPaid("yes");
     }
   };
@@ -161,31 +132,19 @@ const History = ({ modifyRef }) => {
     //Remove from account state
     dispatch(
       accountActions.removeAccountService({
-        acc: router.query.accNo,
+        accNo,
         service: entryId,
       })
     );
     //Remove from services database
-    const accountIndex = accounts.findIndex(
-      (acc) => acc._id.toString() === router.query.accNo
-    );
 
-    const serviceIndex = accounts[accountIndex].services.findIndex(
+    const serviceIndex = account.services.findIndex(
       (acc) => acc._id.toString() === entryId
     );
 
-    await removeEntry(
-      user._id,
-      router.query.accNo,
-      entryId,
-      accounts[accountIndex].services,
-      serviceIndex
-    );
+    await removeEntry(user._id, accNo, entryId, account.services, serviceIndex);
 
-    const data = await retrieveAccountData(
-      router.query.company,
-      router.query.accNo
-    );
+    const data = await retrieveAccountData(company, accNo);
     dispatch(accountActions.setAccData(data));
     onRemoveClose();
     setInputDropName("");
@@ -488,7 +447,6 @@ const History = ({ modifyRef }) => {
                 onMouseEnter={() =>
                   dispatch(
                     accountActions.setPrintAccount({
-                      accountId: router.query.accNo,
                       index,
                     })
                   )
@@ -510,11 +468,7 @@ const History = ({ modifyRef }) => {
                           </Text>
                           <Badge
                             size={"sm"}
-                            bg={
-                              acc.paid
-                                ? process.env.NEXT_PUBLIC_BTN_2
-                                : "red.400"
-                            }
+                            bg={acc.paid ? "btn.200" : "red.400"}
                           >
                             {acc.paid ? "Yes" : "No"}
                           </Badge>
@@ -545,9 +499,9 @@ const History = ({ modifyRef }) => {
                       <Text fontWeight={"semibold"}>Services:</Text>
                       <Box>
                         <OrderedList fontSize={"sm"}>
-                          {acc?.services?.map((service) => (
+                          {acc?.services?.map((service, index) => (
                             <>
-                              <ListItem>
+                              <ListItem key={index}>
                                 {service.date.substring(5).concat(`-${year}`)}
                                 {service.service
                                   ? `- ${service.service}`
@@ -569,22 +523,14 @@ const History = ({ modifyRef }) => {
                       <Button
                         size={"sm"}
                         onClick={() =>
-                          acc.paid
-                            ? unPayHandler(acc._id, index)
-                            : payHandler(acc._id, index)
+                          acc.paid ? unPayHandler(acc._id) : payHandler(acc._id)
                         }
-                        bg={
-                          acc.paid ? "red.400" : process.env.NEXT_PUBLIC_BTN_2
-                        }
+                        bg={acc.paid ? "red.400" : "btn.200"}
                         _hover={{
-                          bg: acc.paid
-                            ? "red.400"
-                            : process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: acc.paid ? "red.400" : "btn_hover.100",
                         }}
                         _active={{
-                          bg: acc.paid
-                            ? "red.400"
-                            : process.env.NEXT_PUBLIC_BTN_HOVER,
+                          bg: acc.paid ? "red.400" : "btn_hover.100",
                         }}
                         _focus={{ boxShadow: "none" }}
                         color={"#000"}

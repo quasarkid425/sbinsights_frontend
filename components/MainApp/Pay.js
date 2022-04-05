@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Flex,
@@ -23,7 +23,11 @@ import {
   CloseButton,
   useToast,
 } from "@chakra-ui/react";
-import { setHourlyWage, retrieveEmployeeData } from "../../actions/employees";
+import {
+  setHourlyWage,
+  retrieveEmployeeData,
+  retrieveEmployee,
+} from "../../actions/employees";
 import { IoIosAdd } from "react-icons/io";
 import { GrCircleInformation } from "react-icons/gr";
 import { useSelector, useDispatch } from "react-redux";
@@ -31,52 +35,49 @@ import { useRouter } from "next/router";
 import { employeeActions } from "../../store/employeeSlice";
 import { v4 as uuidv4 } from "uuid";
 import { submitPaidEntry } from "../../actions/employees";
-import { getDateByYear } from "../../utils/helpers";
 
 const Pay = () => {
+  const router = useRouter();
+  const { company: slug, empNo } = router.query;
+  const { employee } = useSelector((state) => state.employees);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [error, setError] = useState(false);
-  const router = useRouter();
   let entry = {};
   const { user } = useSelector((state) => state.user);
-  const { employees } = useSelector((state) => state.employees);
   const { wage } = useSelector((state) => state.employees);
-
   const dispatch = useDispatch();
-
-  const index = employees.findIndex((emp) => emp._id === router.query.empNo);
 
   const setHourlyWageHandler = () => {
     setError(false);
     setHourlyWage(
       router.query.company,
       router.query.empNo,
-      employees[index].pay.hourlyWage
+      employee.pay.hourlyWage
     );
     onClose();
   };
 
   const recordPayHandler = async () => {
-    const newDate = employees[index].pay.date.split("-");
+    const newDate = employee.pay.date.split("-");
     const formattedDate = `${newDate[1]}-${newDate[2]}-${newDate[0]}`;
 
-    if (!employees[index].pay.total) {
+    if (!employee.pay.total) {
       setError(true);
     } else {
       if (wage) {
         entry = {
-          wage: employees[index].pay.hourlyWage,
-          hours: employees[index].pay.hours,
-          total: employees[index].pay.total,
+          wage: employee.pay.hourlyWage,
+          hours: employee.pay.hours,
+          total: employee.pay.total,
           date: formattedDate,
           _id: uuidv4(),
         };
       } else {
         entry = {
-          wage: employees[index].pay.wage,
-          hours: employees[index].pay.hours,
-          total: employees[index].pay.total,
+          wage: employee.pay.wage,
+          hours: employee.pay.hours,
+          total: employee.pay.total,
           date: formattedDate,
           _id: uuidv4(),
         };
@@ -84,7 +85,6 @@ const Pay = () => {
       dispatch(
         employeeActions.recordPaidEntry({
           entry,
-          index,
           wage,
         })
       );
@@ -110,6 +110,14 @@ const Pay = () => {
       dispatch(employeeActions.setEmpData(data));
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await retrieveEmployee(slug, empNo);
+      dispatch(employeeActions.setEmployee(data));
+    };
+    fetchData().catch(console.error);
+  }, []);
 
   return (
     <>
@@ -142,7 +150,6 @@ const Pay = () => {
                   dispatch(
                     employeeActions.recordField({
                       field: "hourlyWage",
-                      index,
                       value: e.target.value,
                     })
                   );
@@ -150,9 +157,9 @@ const Pay = () => {
                 type={"number"}
                 value={
                   wage
-                    ? employees[index]?.pay?.hourlyWage === 0
+                    ? employee.pay?.hourlyWage === 0
                       ? ""
-                      : employees[index]?.pay?.hourlyWage
+                      : employee.pay?.hourlyWage
                     : ""
                 }
               />
@@ -193,12 +200,11 @@ const Pay = () => {
               dispatch(
                 employeeActions.recordField({
                   field: "date",
-                  index,
                   value: e.target.value,
                 })
               );
             }}
-            value={getDateByYear()}
+            value={employee.pay?.date}
           />
         </FormControl>
         <FormControl>
@@ -206,24 +212,18 @@ const Pay = () => {
             Hours
           </FormLabel>
           <Input
-            size={"sm"}
             type={"number"}
-            id={"hours"}
+            step="0.01"
+            value={employee.pay?.hours === 0 ? "" : employee.pay?.hours}
             onChange={(e) => {
               setError(false);
               dispatch(
                 employeeActions.recordField({
                   field: "hours",
-                  index,
                   value: e.target.value,
                 })
               );
             }}
-            value={
-              employees[index]?.pay?.hours === 0
-                ? ""
-                : employees[index]?.pay?.hours
-            }
           />
         </FormControl>
         <FormControl>
@@ -250,7 +250,6 @@ const Pay = () => {
                 dispatch(
                   employeeActions.recordField({
                     field: "amount",
-                    index,
                     value: e.target.value,
                   })
                 );
@@ -258,12 +257,12 @@ const Pay = () => {
               type={"number"}
               value={
                 wage
-                  ? employees[index]?.pay?.hourlyWage === 0
+                  ? employee.pay?.hourlyWage === 0
                     ? ""
-                    : employees[index]?.pay?.hourlyWage.toFixed(2)
-                  : employees[index]?.pay?.wage === 0
+                    : employee.pay?.hourlyWage.toFixed(2)
+                  : employee.pay?.wage === 0
                   ? ""
-                  : employees[index]?.pay?.wage
+                  : employee.pay?.wage
               }
             />
           </Flex>
@@ -276,20 +275,20 @@ const Pay = () => {
             </Text>
             <Text fontWeight={"semibold"} fontSize={"md"}>
               $
-              {isNaN(employees[index]?.pay?.total.toFixed(2))
+              {isNaN(employee.pay?.total?.toFixed(2))
                 ? ""
-                : employees[index]?.pay?.total.toFixed(2)}
+                : employee.pay?.total?.toFixed(2)}
             </Text>
           </Stack>
         </Flex>
         <Button
           size={"sm"}
-          bg={process.env.NEXT_PUBLIC_BTN_2}
+          bg={"btn.200"}
           _hover={{
-            bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+            bg: "btn_hover.100",
           }}
           _active={{
-            bg: process.env.NEXT_PUBLIC_BTN_HOVER,
+            bg: "btn_hover.100",
           }}
           _focus={{ boxShadow: "none" }}
           color={"#000"}
