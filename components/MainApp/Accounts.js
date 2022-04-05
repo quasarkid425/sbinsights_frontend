@@ -76,10 +76,9 @@ const Accounts = () => {
               <Heading size={"sm"}>Accounts</Heading>
 
               <InputGroup w={"25%"} size={"sm"}>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.300" />}
-                />
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.300" />
+                </InputLeftElement>
                 <Input
                   type="text"
                   placeholder="Search accounts"
@@ -100,7 +99,7 @@ const Accounts = () => {
                 <BsArrowUp size={45} />
               </Box>
               <Text fontSize={"md"} mt={"1rem"}>
-                Add your first account by clicking 'Add Account'
+                Add your first account by clicking &lsquo;Add Account&rsquo;
               </Text>
             </Grid>
           </>

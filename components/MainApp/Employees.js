@@ -252,10 +252,9 @@ const Employees = () => {
             <>
               <Heading size={"sm"}>Employees</Heading>
               <InputGroup w={"25%"} size={"sm"}>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.300" />}
-                />
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.300" />
+                </InputLeftElement>
                 <Input
                   type="text"
                   placeholder="Search employees"
@@ -275,7 +274,7 @@ const Employees = () => {
                 <BsArrowUp size={45} />
               </Box>
               <Text fontSize={"md"} pt={"1rem"}>
-                Add your first employee by clicking 'Add Employee'
+                Add your first employee by clicking &lsquo;Add Employee&rsquo;
               </Text>
             </Grid>
           </>

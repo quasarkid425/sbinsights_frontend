@@ -187,26 +187,14 @@ const Entries = ({ historyRef }) => {
           </ModalHeader>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <ModalBody fontSize={"sm"}>
-            {option === "service"
-              ? user?.quickServices?.length === 0
-                ? "Product / Service quick notes are not set up yet - Click the 'Quick Notes' icon in the top right to set up"
-                : user?.quickServices?.map((service, index) => (
-                    <Input
-                      key={index}
-                      size={"sm"}
-                      placeholder={service}
-                      mb={".5rem"}
-                      cursor={"pointer"}
-                      style={{
-                        color: "transparent",
-                        textShadow: "0 0 0",
-                      }}
-                      onClick={() => setQuickService(service)}
-                    />
-                  ))
-              : user?.quickDescriptions?.length === 0
-              ? "Description quick notes are not set up yet - Click the 'Quick Notes' icon in the top right to set up"
-              : user?.quickDescriptions?.map((service, index) => (
+            {option === "service" ? (
+              user?.quickServices?.length === 0 ? (
+                <Text>
+                  Product / Service quick notes are not set up yet - Click the
+                  &lsquo;Quick Notes&rsquo; icon in the top right to set up
+                </Text>
+              ) : (
+                user?.quickServices?.map((service, index) => (
                   <Input
                     key={index}
                     size={"sm"}
@@ -217,9 +205,31 @@ const Entries = ({ historyRef }) => {
                       color: "transparent",
                       textShadow: "0 0 0",
                     }}
-                    onClick={() => setQuickDesc(service)}
+                    onClick={() => setQuickService(service)}
                   />
-                ))}
+                ))
+              )
+            ) : user?.quickDescriptions?.length === 0 ? (
+              <Text>
+                Description quick notes are not set up yet - Click the
+                &lsquo;Quick Notes&rsquo; icon in the top right to set up
+              </Text>
+            ) : (
+              user?.quickDescriptions?.map((service, index) => (
+                <Input
+                  key={index}
+                  size={"sm"}
+                  placeholder={service}
+                  mb={".5rem"}
+                  cursor={"pointer"}
+                  style={{
+                    color: "transparent",
+                    textShadow: "0 0 0",
+                  }}
+                  onClick={() => setQuickDesc(service)}
+                />
+              ))
+            )}
           </ModalBody>
 
           <ModalFooter>

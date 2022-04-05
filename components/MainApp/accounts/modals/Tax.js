@@ -62,7 +62,7 @@ const Tax = () => {
               <Text mb={".75rem"} fontSize={"sm"}>
                 Select the states below by clicking on the states you will be
                 adding sales tax to the most when billing customers, click the
-                'x' to deselect:
+                &lsquo;x&rsquo; to deselect:
               </Text>
               {taxes.taxStates.map((state, index) => (
                 <Flex align={"center"} key={index}>

@@ -589,10 +589,9 @@ const Expenses = () => {
               <Heading size={"sm"}>Expenses</Heading>
 
               <InputGroup w={"25%"} size={"sm"}>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.300" />}
-                />
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.300" />
+                </InputLeftElement>
                 <Input
                   type="text"
                   placeholder="Search expenses"
@@ -612,7 +611,7 @@ const Expenses = () => {
                 <BsArrowUp size={45} />
               </Box>
               <Text fontSize={"md"} pt={"1rem"}>
-                Add your first expense by clicking 'Add Expense'
+                Add your first expense by clicking &lsquo;Add Expense&rsquo;
               </Text>
             </Grid>
           </>
