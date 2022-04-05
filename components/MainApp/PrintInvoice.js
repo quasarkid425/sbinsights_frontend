@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
-export const PrintInvoice = React.forwardRef((props, ref) => {
+export const Print = (props, ref) => {
   const { user } = useSelector((state) => state.user);
   const { printInfo } = useSelector((state) => state.accounts);
 
@@ -148,4 +148,6 @@ export const PrintInvoice = React.forwardRef((props, ref) => {
       </Text>
     </Box>
   );
-});
+};
+
+export const PrintInvoice = React.forwardRef(Print);
