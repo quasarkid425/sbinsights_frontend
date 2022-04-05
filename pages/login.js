@@ -57,7 +57,6 @@ const Login = () => {
         setIsSubmitting(false);
       } else {
         dispatch(userActions.setUser(data.user));
-        console.log(data.taxes);
         dispatch(taxActions.setTax(data.taxes));
         toast({
           title: `We've missed you, ${data.user.firstName}!`,
