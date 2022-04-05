@@ -644,7 +644,7 @@ const Entries = ({ historyRef }) => {
           <Flex align={"center"} gap={"3rem"} justify={"end"} mt={"5rem"}>
             <Text fontSize={"md"}>
               To start billing accounts, set up sales taxes by clicking on the
-              '$'{" "}
+              &lsquo;$&rsquo;{" "}
             </Text>
             <Box mb={".5rem"}>
               <BsArrowUp size={45} />

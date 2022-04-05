@@ -48,7 +48,7 @@ import {
   AiOutlineMail,
 } from "react-icons/ai";
 import { BiSortAlt2 } from "react-icons/bi";
-import PrintInvoice from "./PrintInvoice";
+import { PrintInvoice } from "./PrintInvoice";
 import { selectState } from "../../utils/helpers";
 import { userActions } from "../../store/userSlice";
 
