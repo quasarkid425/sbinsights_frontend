@@ -53,7 +53,6 @@ import {
   IoIosStats,
 } from "react-icons/io";
 import { useRouter } from "next/router";
-import { getDateByYear } from "../../utils/helpers";
 import { expenseActions } from "../../store/expenseSlice";
 
 const Expenses = () => {
@@ -187,7 +186,7 @@ const Expenses = () => {
                 id="date"
                 type="date"
                 size={"sm"}
-                value={getDateByYear()}
+                value={expense.date}
                 onChange={(e) => {
                   dispatch(expenseActions.setExpense(e.target.value));
                 }}
