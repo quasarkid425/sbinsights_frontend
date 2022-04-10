@@ -83,7 +83,7 @@ const SignUp = () => {
   return (
     <>
       <Head>
-        <title>Company Name || Sign Up</title>
+        <title>SBInsights || Sign Up</title>
         {/* <meta name="description" content={product.desc} /> */}
       </Head>
       <Flex

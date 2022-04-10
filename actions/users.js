@@ -103,8 +103,22 @@ export const updateInvoice = (user, details) => {
     .catch((err) => console.log(err));
 };
 
-export const retrieveDashboardPieData = (user) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API}/users/dashboardData/${user}`, {
+export const retrieveDashboardPieData = (userId) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/users/dashboardData/${userId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};
+
+export const retrieveUserData = (user) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/users/allData/${user}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

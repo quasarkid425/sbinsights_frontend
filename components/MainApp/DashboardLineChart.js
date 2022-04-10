@@ -1,4 +1,5 @@
 import React from "react";
+import { useColorMode } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,6 +24,7 @@ ChartJS.register(
 );
 
 const DashboardLineChart = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { dashboardCharts } = useSelector((state) => state.charts);
 
   const { title, data } = dashboardCharts;
@@ -35,13 +37,30 @@ const DashboardLineChart = () => {
 
   const options = {
     responsive: true,
+    color: colorMode === "dark" && "#fff",
     plugins: {
       legend: {
         position: "top",
       },
       title: {
         display: true,
+        color: colorMode === "dark" && "#fff",
         text: title,
+        font: {
+          size: 14,
+        },
+      },
+    },
+    scales: {
+      y: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
+      },
+      x: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
       },
     },
   };

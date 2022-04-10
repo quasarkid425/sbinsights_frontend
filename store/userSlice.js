@@ -2,7 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userState = {
   isLoggedIn: false,
+  calledOnce: false,
   user: {},
+  cityCount: [],
+  viewHistory: {
+    set: false,
+    index: "",
+  },
 };
 
 const userSlice = createSlice({
@@ -18,6 +24,8 @@ const userSlice = createSlice({
     },
     logout(state) {
       state.isLoggedIn = false;
+      state.calledOnce = false;
+      state.viewHistory.set = false;
       state.user = {};
     },
 
@@ -59,6 +67,18 @@ const userSlice = createSlice({
       state.user.invoiceInfo.signature = entry.signature;
       state.user.invoiceInfo.state = entry.state;
       state.user.invoiceInfo.zip = entry.zip;
+    },
+    calledTrue(state, action) {
+      state.calledOnce = true;
+    },
+    viewHistoryTrue(state, action) {
+      const { index } = action.payload;
+      state.viewHistory.set = true;
+      state.viewHistory.index = parseInt(index);
+    },
+    viewHistoryFalse(state, action) {
+      state.viewHistory.set = false;
+      state.viewHistory.index = "";
     },
   },
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Stack, Tooltip } from "@chakra-ui/react";
+import { Box, Flex, Stack, Tooltip, useColorMode } from "@chakra-ui/react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import {
@@ -13,20 +13,29 @@ import {
 
 const DashboardLayout = ({ children }) => {
   const user = useSelector((state) => state.user.user);
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Flex>
       <Stack pl={"1rem"} pt={"2rem"} pr={".5rem"}>
         <Tooltip label="Dashboard" fontSize="md" placement="right">
           <Box as="span">
             <Link href={`/${user.slug}/dashboard`}>
-              <MdDashboard size={"25"} cursor={"pointer"} color={"#718096"} />
+              <MdDashboard
+                size={"21"}
+                cursor={"pointer"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
+              />
             </Link>
           </Box>
         </Tooltip>
         <Tooltip label="Sales" fontSize="md" placement="right">
           <Box as="span">
             <Link href={`/${user.slug}/sales`}>
-              <MdBarChart size={"25"} cursor={"pointer"} color={"#718096"} />
+              <MdBarChart
+                size={"21"}
+                cursor={"pointer"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
+              />
             </Link>
           </Box>
         </Tooltip>
@@ -35,9 +44,9 @@ const DashboardLayout = ({ children }) => {
           <Box as="span">
             <Link href={`/${user.slug}/accounts`}>
               <MdSupervisorAccount
-                size={"25"}
+                size={"21"}
                 cursor={"pointer"}
-                color={"#718096"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
               />
             </Link>
           </Box>
@@ -46,14 +55,22 @@ const DashboardLayout = ({ children }) => {
         <Tooltip label="Employees" fontSize="md" placement="right">
           <Box as="span">
             <Link href={`/${user.slug}/employees`}>
-              <MdAddReaction size={"25"} cursor={"pointer"} color={"#718096"} />
+              <MdAddReaction
+                size={"21"}
+                cursor={"pointer"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
+              />
             </Link>
           </Box>
         </Tooltip>
         <Tooltip label="Expenses" fontSize="md" placement="right">
           <Box as="span">
             <Link href={`/${user.slug}/expenses`}>
-              <MdBuild size={"25"} cursor={"pointer"} color={"#718096"} />
+              <MdBuild
+                size={"21"}
+                cursor={"pointer"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
+              />
             </Link>
           </Box>
         </Tooltip>
@@ -61,9 +78,9 @@ const DashboardLayout = ({ children }) => {
           <Box as="span">
             <Link href={`/${user.slug}/reports`}>
               <MdLibraryBooks
-                size={"25"}
+                size={"21"}
                 cursor={"pointer"}
-                color={"#718096"}
+                color={colorMode === "light" ? "#718096" : "#fff"}
               />
             </Link>
           </Box>

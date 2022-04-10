@@ -28,6 +28,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  useColorMode,
 } from "@chakra-ui/react";
 import {
   updateEmployeeInfo,
@@ -43,9 +44,11 @@ import { IoTrashOutline } from "react-icons/io5";
 import { selectState } from "../../../utils/helpers";
 
 const EmpNo = ({ data }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
   const { company: slug, empNo } = router.query;
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = useSelector((state) => state.user);
   const employee = useSelector(
     (state) =>
       state?.employees?.employees?.filter(
@@ -118,7 +121,7 @@ const EmpNo = ({ data }) => {
         break;
     }
 
-    await updateEmployeeInfo(slug, updatedEmployee._id, updatedEmployee);
+    await updateEmployeeInfo(user._id, updatedEmployee._id, updatedEmployee);
 
     toast({
       description: "Account updated successfully",
@@ -139,12 +142,12 @@ const EmpNo = ({ data }) => {
       duration: 4000,
       isClosable: true,
     });
-    await removeEmployee(slug, employee._id);
+    await removeEmployee(user._id, employee._id);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await retrieveEmployeeData(slug, empNo);
+      const data = await retrieveEmployeeData(user._id, empNo);
       dispatch(employeeActions.setEmpData(data));
     };
 
@@ -181,6 +184,9 @@ const EmpNo = ({ data }) => {
               <Input
                 size={"sm"}
                 placeholder="Enter name"
+                _placeholder={{
+                  color: colorMode === "dark" && "gray.300",
+                }}
                 value={inputDropName}
                 onChange={(e) => setInputDropName(e.target.value)}
               />
@@ -313,6 +319,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empFullName}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empFullName"}
                         value={eName}
                         onChange={(e) => setEName(e.target.value)}
@@ -344,6 +353,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empPhoneNumber}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empPhone"}
                         value={ePhone}
                         onChange={(e) => setEPhone(e.target.value)}
@@ -375,6 +387,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empEmail}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empEmail"}
                         value={eEmail}
                         onChange={(e) => setEEmail(e.target.value)}
@@ -409,6 +424,7 @@ const EmpNo = ({ data }) => {
                         id="empGender"
                         value={empGender}
                         onChange={(e) => setEmpGender(e.target.value)}
+                        color={colorMode === "dark" ? "gray.300" : "gray.400"}
                       >
                         <option value="">Select a Gender</option>
                         <option value="Male">Male</option>
@@ -443,6 +459,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empAddress.empStreet}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empStreet"}
                         value={empStreet}
                         onChange={(e) => setEmpStreet(e.target.value)}
@@ -474,6 +493,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empAddress.empCity}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empCity"}
                         value={empCity}
                         onChange={(e) => setEmpCity(e.target.value)}
@@ -507,6 +529,7 @@ const EmpNo = ({ data }) => {
                         name="state"
                         id="empState"
                         value={empState}
+                        color={colorMode === "dark" ? "gray.300" : "gray.400"}
                         onChange={(e) => setEmpState(e.target.value)}
                       >
                         {selectState()}
@@ -538,6 +561,9 @@ const EmpNo = ({ data }) => {
                       <Input
                         size={"sm"}
                         placeholder={employee?.empAddress.empZipCode}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"empZip"}
                         value={empZip}
                         onChange={(e) => setEmpZip(e.target.value)}

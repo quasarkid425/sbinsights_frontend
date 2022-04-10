@@ -17,8 +17,7 @@ const accountSlice = createSlice({
   initialState: accountState,
   reducers: {
     setAccounts(state, action) {
-      const { accounts } = action.payload;
-      const newAccounts = accounts.map((acc) => {
+      const newAccounts = action.payload.map((acc) => {
         return {
           ...acc,
           entries: acc.entries.map((ent) => {
@@ -149,47 +148,46 @@ const accountSlice = createSlice({
       state.accounts.splice(index, 1);
     },
     addServices(state, action) {
-      const { entry } = action.payload;
+      const { accountIndex, entry } = action.payload;
 
-      state.account.services.unshift(entry);
+      state.accounts[accountIndex].services.unshift(entry);
     },
     pay(state, action) {
-      const { service } = action.payload;
-      const serviceIndex = state.account.services.findIndex(
+      const { accountIndex, service } = action.payload;
+      const serviceIndex = state.accounts[accountIndex].services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.account.services[serviceIndex].paid = true;
+      state.accounts[accountIndex].services[serviceIndex].paid = true;
     },
     unPay(state, action) {
-      const { service } = action.payload;
-
-      const serviceIndex = state.account.services.findIndex(
+      const { accountIndex, service } = action.payload;
+      const serviceIndex = state.accounts[accountIndex].services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.account.services[serviceIndex].paid = false;
+      state.accounts[accountIndex].services[serviceIndex].paid = false;
     },
     removeAccountService(state, action) {
-      const { service } = action.payload;
-      const serviceIndex = state.account.services.findIndex(
+      const { accountIndex, service } = action.payload;
+      const serviceIndex = state.accounts[accountIndex].services.findIndex(
         (acc) => acc._id.toString() === service
       );
 
-      state.account.services.splice(serviceIndex, 1);
+      state.accounts[accountIndex].services.splice(serviceIndex, 1);
     },
     sortServicesByDate(state, action) {
-      const { date } = action.payload;
+      const { accountIndex, date } = action.payload;
       switch (date) {
         case "asc":
-          state.account.services.sort(function (a, b) {
+          state.accounts[accountIndex].services.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa < bb ? -1 : aa > bb ? 1 : 0;
           });
           break;
         case "desc":
-          state.account.services.sort(function (a, b) {
+          state.accounts[accountIndex].services.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa > bb ? -1 : aa < bb ? 1 : 0;
@@ -198,28 +196,31 @@ const accountSlice = createSlice({
       }
     },
     sortServicesByPay(state, action) {
-      const { paid } = action.payload;
+      const { accountIndex, paid } = action.payload;
       switch (paid) {
         case "yes":
-          state.account.services.sort((a, b) => (a.paid < b.paid ? 1 : -1));
+          state.accounts[accountIndex].services.sort((a, b) =>
+            a.paid < b.paid ? 1 : -1
+          );
           break;
         case "no":
-          state.account.services.sort((a, b) => (a.paid > b.paid ? 1 : -1));
+          state.accounts[accountIndex].services.sort((a, b) =>
+            a.paid > b.paid ? 1 : -1
+          );
           break;
       }
     },
 
     setPrintAccount(state, action) {
-      const { index } = action.payload;
-      state.printInfo.account = state.account;
-      state.printInfo.service = state.account.services[index];
+      const { accountIndex, index } = action.payload;
+      state.printInfo.account = state.accounts[accountIndex];
+      state.printInfo.service = state.accounts[accountIndex].services[index];
     },
 
     //entry actions
     recordField(state, action) {
-      const { field, value, index } = action.payload;
-      const account = state.account.entries[index];
-
+      const { field, accountIndex, value, index } = action.payload;
+      const account = state.accounts[accountIndex].entries[index];
       switch (field) {
         case "service":
           account.chartDate = account.date;
@@ -274,8 +275,9 @@ const accountSlice = createSlice({
       }
     },
     newField(state, action) {
+      const { accountIndex } = action.payload;
       //this needs to be changed to the format of the new entry
-      state.account.entries.push({
+      state.accounts[accountIndex].entries.push({
         service: "",
         desc: "",
         qty: 1,
@@ -290,12 +292,12 @@ const accountSlice = createSlice({
       });
     },
     removeField(state, action) {
-      const { index } = action.payload;
-      state.account.entries.splice(index, 1);
+      const { accountIndex, index } = action.payload;
+      state.accounts[accountIndex].entries.splice(index, 1);
     },
     setQuickNote(state, action) {
-      const { type, value, index } = action.payload;
-      const account = state.account.entries[index];
+      const { type, value, accountIndex, index } = action.payload;
+      const account = state.accounts[accountIndex].entries[index];
       account.chartDate = account.date;
       switch (type) {
         case "service":
@@ -307,8 +309,8 @@ const accountSlice = createSlice({
       }
     },
     clearEntries(state, action) {
-      //this needs to be changed to the modal entry
-      state.account.entries = [
+      const { accountIndex } = action.payload;
+      state.accounts[accountIndex].entries = [
         {
           service: "",
           desc: "",
@@ -325,8 +327,8 @@ const accountSlice = createSlice({
     },
 
     noSalesTax(state, action) {
-      const { index } = action.payload;
-      const account = state.account.entries[index];
+      const { accountIndex, index } = action.payload;
+      const account = state.accounts[accountIndex].entries[index];
       account.tax = false;
       account.total = account.amount * account.qty;
     },

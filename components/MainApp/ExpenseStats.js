@@ -1,3 +1,4 @@
+import { useColorMode } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,18 +19,35 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
 const ExpenseStats = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { expenseStats } = useSelector((state) => state.expenses);
   const options = {
     responsive: true,
+    color: colorMode === "dark" && "#fff",
     plugins: {
       legend: {
         position: "top",
       },
       title: {
         display: true,
+        color: colorMode === "dark" && "#fff",
         text: "Total Amount Spent By Expense",
+        font: {
+          size: 14,
+        },
+      },
+    },
+    scales: {
+      y: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
+      },
+      x: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
       },
     },
   };

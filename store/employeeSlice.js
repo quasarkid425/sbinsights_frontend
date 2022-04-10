@@ -14,13 +14,23 @@ const employeeSlice = createSlice({
   initialState: employeeState,
   reducers: {
     setEmployees(state, action) {
-      state.employees = action.payload;
+      const emps = action.payload.map((acc) => {
+        return {
+          ...acc,
+          pay: {
+            ...acc.pay,
+            date: getDateByYear(),
+          },
+        };
+      });
+      state.employees = emps;
     },
     setEmployee(state, action) {
       state.employee = action.payload;
       state.employee.pay.date = getDateByYear();
     },
     addEmployee(state, action) {
+      action.payload.pay.date = getDateByYear();
       state.employees.unshift(action.payload);
     },
     updateEmployeeDetails(state, action) {
@@ -31,39 +41,36 @@ const employeeSlice = createSlice({
       state.employees.splice(index, 1, updatedEmployee);
     },
     recordField(state, action) {
-      const { field, index, value } = action.payload;
+      const { field, empIndex, value } = action.payload;
+      const employee = state.employees[empIndex];
 
       switch (field) {
         case "date":
-          state.employee.pay.date = value;
+          employee.pay.date = value;
           break;
         case "hours":
-          if (state.employee.pay.hourlyWage === 0) {
-            state.employee.pay.hours = parseFloat(value);
-            state.employee.pay.total =
-              parseFloat(value) * state.employee.pay.wage;
+          if (employee.pay.hourlyWage === 0) {
+            employee.pay.hours = parseFloat(value);
+            employee.pay.total = parseFloat(value) * employee.pay.wage;
           } else {
-            state.employee.pay.hours = parseFloat(value);
-            state.employee.pay.total =
-              parseFloat(value) * state.employee.pay.hourlyWage;
+            employee.pay.hours = parseFloat(value);
+            employee.pay.total = parseFloat(value) * employee.pay.hourlyWage;
           }
           break;
         case "amount":
           state.wage = false;
-          state.employee.pay.hourlyWage = 0;
-          state.employee.pay.wage = parseFloat(value);
-          state.employee.pay.total =
-            parseFloat(value) * state.employee.pay.hours;
+          employee.pay.hourlyWage = 0;
+          employee.pay.wage = parseFloat(value);
+          employee.pay.total = parseFloat(value) * employee.pay.hours;
           break;
         case "hourlyWage":
           state.wage = true;
-          state.employee.pay.wage = 0;
-          if (state.employee.pay.hours === 0) {
-            state.employee.pay.hourlyWage = parseFloat(value);
+          employee.pay.wage = 0;
+          if (employee.pay.hours === 0) {
+            employee.pay.hourlyWage = parseFloat(value);
           } else {
-            state.employee.pay.hourlyWage = parseFloat(value);
-            state.employee.pay.total =
-              parseFloat(value) * state.employee.pay.hours;
+            employee.pay.hourlyWage = parseFloat(value);
+            employee.pay.total = parseFloat(value) * employee.pay.hours;
           }
           break;
       }
@@ -78,38 +85,36 @@ const employeeSlice = createSlice({
     sortCollectionAsc(state, action) {
       switch (action.payload) {
         case "Name":
-          state.employees.sort((a, b) =>
-            a.empFullName > b.empFullName ? 1 : -1
-          );
+          employees.sort((a, b) => (a.empFullName > b.empFullName ? 1 : -1));
           break;
         case "Phone":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empPhoneNumber > b.empPhoneNumber ? 1 : -1
           );
           break;
         case "Email":
-          state.employees.sort((a, b) => (a.empEmail > b.empEmail ? 1 : -1));
+          employees.sort((a, b) => (a.empEmail > b.empEmail ? 1 : -1));
           break;
         case "Gender":
-          state.employees.sort((a, b) => (a.empGender > b.empGender ? 1 : -1));
+          employees.sort((a, b) => (a.empGender > b.empGender ? 1 : -1));
           break;
         case "Address":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empStreet > b.empAddress.empStreet ? 1 : -1
           );
           break;
         case "City":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empCity > b.empAddress.empCity ? 1 : -1
           );
           break;
         case "State":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empState > b.empAddress.empState ? 1 : -1
           );
           break;
         case "Zip Code":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empZipCode > b.empAddress.empZipCode ? 1 : -1
           );
           break;
@@ -119,56 +124,54 @@ const employeeSlice = createSlice({
     sortCollectionDesc(state, action) {
       switch (action.payload) {
         case "Name":
-          state.employees.sort((a, b) =>
-            a.empFullName < b.empFullName ? 1 : -1
-          );
+          employees.sort((a, b) => (a.empFullName < b.empFullName ? 1 : -1));
           break;
         case "Phone":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empPhoneNumber < b.empPhoneNumber ? 1 : -1
           );
           break;
         case "Email":
-          state.employees.sort((a, b) => (a.empEmail < b.empEmail ? 1 : -1));
+          employees.sort((a, b) => (a.empEmail < b.empEmail ? 1 : -1));
           break;
         case "Gender":
-          state.employees.sort((a, b) => (a.empGender < b.empGender ? 1 : -1));
+          employees.sort((a, b) => (a.empGender < b.empGender ? 1 : -1));
           break;
         case "Address":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empStreet < b.empAddress.empStreet ? 1 : -1
           );
           break;
         case "City":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empCity < b.empAddress.empCity ? 1 : -1
           );
           break;
         case "State":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empState < b.empAddress.empState ? 1 : -1
           );
           break;
         case "Zip Code":
-          state.employees.sort((a, b) =>
+          employees.sort((a, b) =>
             a.empAddress.empZipCode < b.empAddress.empZipCode ? 1 : -1
           );
           break;
       }
     },
     sortEntriesByDate(state, action) {
-      const { date } = action.payload;
+      const { empIndex, date } = action.payload;
 
       switch (date) {
         case "asc":
-          state.employee.paidEntries.sort(function (a, b) {
+          state.employees[empIndex].paidEntries.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa < bb ? -1 : aa > bb ? 1 : 0;
           });
           break;
         case "desc":
-          state.employee.paidEntries.sort(function (a, b) {
+          state.employees[empIndex].paidEntries.sort(function (a, b) {
             const aa = a.date.split("-").reverse().join(),
               bb = b.date.split("-").reverse().join();
             return aa > bb ? -1 : aa < bb ? 1 : 0;
@@ -177,27 +180,28 @@ const employeeSlice = createSlice({
       }
     },
     recordPaidEntry(state, action) {
-      const { entry, wage } = action.payload;
+      const { entry, empIndex, wage } = action.payload;
+      const employee = state.employees[empIndex];
       if (wage) {
-        state.employee.paidEntries.unshift(entry);
-        state.employee.pay.hours = 0;
-        state.employee.pay.total = 0;
-        state.employee.pay.date = getDateByYear();
+        employee.paidEntries.unshift(entry);
+        employee.pay.hours = 0;
+        employee.pay.total = 0;
+        employee.pay.date = getDateByYear();
       } else {
-        state.employee.paidEntries.unshift(entry);
-        state.employee.pay.hours = 0;
-        state.employee.pay.total = 0;
-        state.employee.pay.date = getDateByYear();
+        employee.paidEntries.unshift(entry);
+        employee.pay.hours = 0;
+        employee.pay.total = 0;
+        employee.pay.date = getDateByYear();
       }
     },
 
     removeAccountService(state, action) {
-      const { entryId } = action.payload;
-      const entryIndex = state.employee.paidEntries.findIndex(
+      const { empIndex, entryId } = action.payload;
+      const entryIndex = state.employees[empIndex].paidEntries.findIndex(
         (emp) => emp._id.toString() === entryId
       );
 
-      state.employee.paidEntries.splice(entryIndex, 1);
+      state.employees[empIndex].paidEntries.splice(entryIndex, 1);
     },
     setEmpData(state, action) {
       state.employeeStats = action.payload;

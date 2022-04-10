@@ -35,3 +35,20 @@ export const saveEntries = (user, account, entries) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const clearServiceEntries = (userId, acc) => {
+  return fetch(
+    `${process.env.NEXT_PUBLIC_API}/entries/clear/${userId}/${acc}`,
+    {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log(err));
+};

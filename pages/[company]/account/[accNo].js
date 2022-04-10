@@ -28,6 +28,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  useColorMode,
 } from "@chakra-ui/react";
 import {
   updateAccountInfo,
@@ -41,12 +42,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { accountActions } from "../../../store/accountSlice";
 import { IoTrashOutline } from "react-icons/io5";
 import { selectState } from "../../../utils/helpers";
+import { userActions } from "../../../store/userSlice";
 
 const AccNo = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
   const { company: slug, accNo } = router.query;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const { user } = useSelector((state) => state.user);
   const account = useSelector(
     (state) =>
       state?.accounts?.accounts?.filter(
@@ -120,7 +124,7 @@ const AccNo = () => {
         break;
     }
 
-    await updateAccountInfo(slug, accNo, updatedCustomerAccount);
+    await updateAccountInfo(user._id, accNo, updatedCustomerAccount);
 
     toast({
       description: "Account updated successfully",
@@ -142,12 +146,12 @@ const AccNo = () => {
       isClosable: true,
     });
 
-    await removeAccount(slug, accNo);
+    await removeAccount(user._id, accNo);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await retrieveAccountData(slug, accNo);
+      const data = await retrieveAccountData(user._id, accNo);
       dispatch(accountActions.setAccData(data));
     };
 
@@ -184,6 +188,9 @@ const AccNo = () => {
               <Input
                 size={"sm"}
                 placeholder="Enter name"
+                _placeholder={{
+                  color: colorMode === "dark" && "gray.300",
+                }}
                 value={inputDropName}
                 onChange={(e) => setInputDropName(e.target.value)}
               />
@@ -239,6 +246,7 @@ const AccNo = () => {
               _active={{
                 background: "",
               }}
+              onClick={(e) => dispatch(userActions.viewHistoryFalse())}
             >
               Accounts
             </Button>
@@ -326,6 +334,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accFullName}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accFullName"}
                         value={aName}
                         onChange={(e) => setAName(e.target.value)}
@@ -357,6 +368,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accPhoneNumber}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accPhone"}
                         value={aPhone}
                         onChange={(e) => setAPhone(e.target.value)}
@@ -388,6 +402,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accEmail}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accEmail"}
                         value={aEmail}
                         onChange={(e) => setAEmail(e.target.value)}
@@ -419,6 +436,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accAddress.addrFullName}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accBillingName"}
                         value={adrName}
                         onChange={(e) => setAdrName(e.target.value)}
@@ -450,6 +470,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accAddress.addrStreet}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accBillingAddr"}
                         value={adrStreet}
                         onChange={(e) => setAdrStreet(e.target.value)}
@@ -481,6 +504,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accAddress.addrCity}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accBillingCity"}
                         value={adrCity}
                         onChange={(e) => setAdrCity(e.target.value)}
@@ -515,6 +541,7 @@ const AccNo = () => {
                         id="state"
                         value={adrState}
                         onChange={(e) => setAdrState(e.target.value)}
+                        color={colorMode === "dark" ? "gray.300" : "gray.400"}
                       >
                         {selectState()}
                       </Select>
@@ -545,6 +572,9 @@ const AccNo = () => {
                       <Input
                         size={"sm"}
                         placeholder={account?.accAddress.addrZipCode}
+                        _placeholder={{
+                          color: colorMode === "dark" && "gray.300",
+                        }}
                         id={"accBillingZip"}
                         value={adrZip}
                         onChange={(e) => setAdrZip(e.target.value)}

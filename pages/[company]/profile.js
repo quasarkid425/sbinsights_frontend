@@ -12,6 +12,7 @@ import {
   InputGroup,
   InputRightElement,
   Box,
+  useColorMode,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
@@ -26,6 +27,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import { expenseActions } from "../../store/expenseSlice";
 
 const Profile = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { user } = useSelector((state) => state.user);
   const [companyName, setCompanyName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -124,6 +126,7 @@ const Profile = () => {
         <Box pt={2} pb={4}>
           <Link href={`/${slug}/dashboard`}>
             <Button
+              size={"sm"}
               leftIcon={<FiArrowLeft />}
               variant="ghost"
               px={0}
@@ -149,20 +152,25 @@ const Profile = () => {
           justifyContent={"space-between"}
           pb={"1.5rem"}
         >
-          <Heading fontWeight={"semibold"} size={"lg"}>
+          <Heading fontWeight={"semibold"} size={"sm"}>
             Account details: {user.companyName}
           </Heading>
         </Flex>
 
         <FormControl>
-          <FormLabel htmlFor="accBillingAddr">Company Name</FormLabel>
+          <FormLabel htmlFor="accBillingAddr" fontSize={"sm"}>
+            Company Name
+          </FormLabel>
           <Flex gap={"1rem"}>
             <Input
+              size={"sm"}
               placeholder={user.companyName}
+              _placeholder={{ color: colorMode === "dark" && "#e4e4e4" }}
               onChange={(e) => setCompanyName(e.target.value)}
               value={companyName}
             />
             <Button
+              size={"sm"}
               bg={"btn.100"}
               _hover={{
                 bg: "btn_hover.100",
@@ -180,14 +188,19 @@ const Profile = () => {
           </Flex>
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="accBillingAddr">First Name</FormLabel>
+          <FormLabel htmlFor="accBillingAddr" fontSize={"sm"}>
+            First Name
+          </FormLabel>
           <Flex gap={"1rem"}>
             <Input
+              size={"sm"}
               placeholder={user.firstName}
+              _placeholder={{ color: colorMode === "dark" && "#e4e4e4" }}
               onChange={(e) => setFirstName(e.target.value)}
               value={firstName}
             />
             <Button
+              size={"sm"}
               bg={"btn.100"}
               _hover={{
                 bg: "btn_hover.100",
@@ -205,39 +218,19 @@ const Profile = () => {
           </Flex>
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="accBillingAddr">Last Name</FormLabel>
+          <FormLabel htmlFor="accBillingAddr" fontSize={"sm"}>
+            Email
+          </FormLabel>
           <Flex gap={"1rem"}>
             <Input
-              placeholder={user.lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              value={lastName}
-            />
-            <Button
-              bg={"btn.100"}
-              _hover={{
-                bg: "btn_hover.100",
-              }}
-              _active={{
-                bg: "btn_hover.100",
-              }}
-              _focus={{ boxShadow: "none" }}
-              color={"#fff"}
-              onClick={() => updateCustomerProfile("lastName")}
-              disabled={lastName === ""}
-            >
-              Update
-            </Button>
-          </Flex>
-        </FormControl>
-        <FormControl>
-          <FormLabel htmlFor="accBillingAddr">Email</FormLabel>
-          <Flex gap={"1rem"}>
-            <Input
+              size={"sm"}
               placeholder={user.email}
+              _placeholder={{ color: colorMode === "dark" && "#e4e4e4" }}
               onChange={(e) => setEmail(e.target.value)}
               value={email}
             />
             <Button
+              size={"sm"}
               bg={"btn.100"}
               _hover={{
                 bg: "btn_hover.100",
@@ -255,10 +248,13 @@ const Profile = () => {
           </Flex>
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="accBillingAddr">Password</FormLabel>
+          <FormLabel htmlFor="accBillingAddr" fontSize={"sm"}>
+            Password
+          </FormLabel>
           <Flex gap={"1rem"}>
             <InputGroup>
               <Input
+                size={"sm"}
                 onChange={(e) => setPassword(e.target.value)}
                 type={showPassword ? "text" : "password"}
                 value={password}
@@ -276,6 +272,7 @@ const Profile = () => {
             </InputGroup>
 
             <Button
+              size={"sm"}
               bg={"btn.100"}
               _hover={{
                 bg: "btn_hover.100",

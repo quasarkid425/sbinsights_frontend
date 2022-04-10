@@ -1,3 +1,4 @@
+import { useColorMode } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,17 +21,35 @@ ChartJS.register(
 );
 
 const AccountStats = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { accountStats } = useSelector((state) => state.accounts);
 
   const options = {
     responsive: true,
+    color: colorMode === "dark" && "#fff",
     plugins: {
       legend: {
         position: "top",
       },
       title: {
         display: true,
+        color: colorMode === "dark" && "#fff",
         text: "Total Billed to Account By Day",
+        font: {
+          size: 14,
+        },
+      },
+    },
+    scales: {
+      y: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
+      },
+      x: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
       },
     },
   };

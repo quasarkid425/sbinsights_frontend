@@ -16,7 +16,7 @@ export const addAccount = (user, newAcc) => {
     .catch((err) => console.log(err));
 };
 
-export const updateAccountInfo = (slug, accNo, updatedAcc) => {
+export const updateAccountInfo = (userId, accNo, updatedAcc) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/accounts`, {
     method: "PUT",
     headers: {
@@ -24,7 +24,7 @@ export const updateAccountInfo = (slug, accNo, updatedAcc) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      slug,
+      userId,
       accNo,
       updatedAcc,
     }),
@@ -35,7 +35,7 @@ export const updateAccountInfo = (slug, accNo, updatedAcc) => {
     .catch((err) => console.log(err));
 };
 
-export const removeAccount = (slug, accNo) => {
+export const removeAccount = (userId, accNo) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/accounts`, {
     method: "DELETE",
     headers: {
@@ -43,7 +43,7 @@ export const removeAccount = (slug, accNo) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      slug,
+      userId,
       accNo,
     }),
   })
@@ -239,8 +239,8 @@ export const chartData = (user, type) => {
     .catch((err) => console.log(err));
 };
 
-export const retrieveAccounts = (user) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/${user}`, {
+export const retrieveAccounts = (userId) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -253,8 +253,8 @@ export const retrieveAccounts = (user) => {
     .catch((err) => console.log(err));
 };
 
-export const retrieveAccount = (slug, acc) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/acc/${slug}/${acc}`, {
+export const retrieveAccount = (userId, acc) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/accounts/acc/${userId}/${acc}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

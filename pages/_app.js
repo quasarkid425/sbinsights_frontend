@@ -27,8 +27,7 @@ function MyApp({ Component, pageProps, router }) {
   return (
     <>
       <Head>
-        <title>Company Name</title>
-        <link rel="icon" href="/favicon-32x32.png" />
+        <title>SBInsights</title>
         {/* <meta name="description" content={product.desc} /> */}
       </Head>
       <Provider store={store}>

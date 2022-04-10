@@ -39,6 +39,69 @@ a {
   transform: rotate(90deg);
 }
 
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* .table tbody tr:nth-of-type(odd) {
+  background-color: #f4f4f4;
+} */
+
+.table-hover:hover {
+  background-color: #cbd5e0;
+  cursor: pointer;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  border: 0.1rem solid #e4e4e4;
+  padding: 0.5rem;
+}
+.table button {
+  margin: 0 0.2rem;
+}
+
+.expense-row:hover {
+  background-color: #cbd5e0;
+}
+@media (max-width: 500px) {
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+  .table tr {
+    margin-bottom: 15px;
+  }
+  .table td {
+    text-align: right;
+    padding-left: 50%;
+    text-align: right;
+    position: relative;
+  }
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 15px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+  }
+}
+.date-picker ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 @media only screen and (max-width: 800px) {
   .arrow-tax {
     transform: rotate(-44deg);

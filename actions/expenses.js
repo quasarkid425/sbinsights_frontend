@@ -52,8 +52,8 @@ export const removeExpense = (user, expenses, index) => {
     .catch((err) => console.log(err));
 };
 
-export const retrieveExpenses = (user) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API}/expenses/${user}`, {
+export const retrieveExpenses = (userId) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/expenses/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

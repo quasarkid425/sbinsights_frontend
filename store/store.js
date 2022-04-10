@@ -8,7 +8,6 @@ import employeeReducer from "./employeeSlice";
 import expenseReducer from "./expenseSlice";
 import taxReducer from "./taxSlice";
 import chartReducer from "./chartSlice";
-
 import { getDefaultMiddleware } from "@reduxjs/toolkit";
 
 const reducers = combineReducers({

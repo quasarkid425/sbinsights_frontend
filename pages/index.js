@@ -10,7 +10,7 @@ const Index = () => {
   return (
     <>
       <Head>
-        <title>Company Name || Home</title>
+        <title>SBInsights || Home</title>
         {/* <meta name="description" content={product.desc} /> */}
       </Head>
       <Box minH={"80vh"}>This is the sales page</Box>

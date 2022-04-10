@@ -30,12 +30,10 @@ import {
   MoonIcon,
   SunIcon,
 } from "@chakra-ui/icons";
-import axios from "axios";
 import LightLogo from "../../assets/logo/logo_light.png";
 import DarkLogo from "../../assets/logo/logo_dark.png";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { FiCornerDownLeft, FiShoppingCart } from "react-icons/fi";
 import { useSelector, useDispatch, RootStateOrAny } from "react-redux";
 import { userActions } from "../../store/userSlice";
 import { expenseActions } from "../../store/expenseSlice";

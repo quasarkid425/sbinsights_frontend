@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import {
   Stack,
@@ -31,6 +31,7 @@ import {
   Select,
   Textarea,
   useToast,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
@@ -53,6 +54,7 @@ import { selectState } from "../../utils/helpers";
 import { userActions } from "../../store/userSlice";
 
 const History = ({ modifyRef }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const [inputDropName, setInputDropName] = useState("");
   const [invStreet, setInvStreet] = useState("");
   const [streetErr, setStreetErr] = useState(false);
@@ -67,12 +69,16 @@ const History = ({ modifyRef }) => {
   const [entryId, setEntryId] = useState("");
   const [date, setDate] = useState("asc");
   const [paid, setPaid] = useState("yes");
-  const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const { account } = useSelector((state) => state.accounts);
-  const { printInfo } = useSelector((state) => state.accounts);
   const router = useRouter();
-  const { company, accNo } = router.query;
+  const { accNo } = router.query;
+  const { user } = useSelector((state) => state.user);
+  const { viewHistory } = useSelector((state) => state.user);
+  const { accounts } = useSelector((state) => state.accounts);
+  const account = accounts.find((acc) => acc._id === accNo);
+  const accountIndex = accounts?.findIndex((acc) => acc._id === account?._id);
+  const dispatch = useDispatch();
+  const { printInfo } = useSelector((state) => state.accounts);
+
   const toast = useToast();
   const {
     isOpen: isRemoveOpen,
@@ -89,7 +95,7 @@ const History = ({ modifyRef }) => {
   const componentRef = useRef();
 
   const payHandler = async (id) => {
-    dispatch(accountActions.pay({ service: id }));
+    dispatch(accountActions.pay({ accountIndex, service: id }));
 
     const serviceIndex = account.services.findIndex(
       (acc) => acc._id.toString() === id
@@ -99,7 +105,7 @@ const History = ({ modifyRef }) => {
   };
 
   const unPayHandler = async (id) => {
-    dispatch(accountActions.unPay({ service: id }));
+    dispatch(accountActions.unPay({ accountIndex, service: id }));
 
     const serviceIndex = account.services.findIndex(
       (acc) => acc._id.toString() === id
@@ -110,20 +116,20 @@ const History = ({ modifyRef }) => {
 
   const sortByDate = () => {
     if (date === "asc") {
-      dispatch(accountActions.sortServicesByDate({ date }));
+      dispatch(accountActions.sortServicesByDate({ accountIndex, date }));
       setDate("desc");
     } else {
-      dispatch(accountActions.sortServicesByDate({ date }));
+      dispatch(accountActions.sortServicesByDate({ accountIndex, date }));
       setDate("asc");
     }
   };
 
   const sortByPay = () => {
     if (paid === "yes") {
-      dispatch(accountActions.sortServicesByPay({ accNo, paid }));
+      dispatch(accountActions.sortServicesByPay({ accountIndex, accNo, paid }));
       setPaid("no");
     } else {
-      dispatch(accountActions.sortServicesByPay({ accNo, paid }));
+      dispatch(accountActions.sortServicesByPay({ accountIndex, accNo, paid }));
       setPaid("yes");
     }
   };
@@ -133,6 +139,7 @@ const History = ({ modifyRef }) => {
     dispatch(
       accountActions.removeAccountService({
         accNo,
+        accountIndex,
         service: entryId,
       })
     );
@@ -144,7 +151,7 @@ const History = ({ modifyRef }) => {
 
     await removeEntry(user._id, accNo, entryId, account.services, serviceIndex);
 
-    const data = await retrieveAccountData(company, accNo);
+    const data = await retrieveAccountData(user._id, accNo);
     dispatch(accountActions.setAccData(data));
     onRemoveClose();
     setInputDropName("");
@@ -267,6 +274,9 @@ const History = ({ modifyRef }) => {
               <Input
                 size={"sm"}
                 placeholder="Enter name"
+                _placeholder={{
+                  color: colorMode === "dark" && "gray.300",
+                }}
                 value={inputDropName}
                 onChange={(e) => setInputDropName(e.target.value)}
               />
@@ -312,8 +322,11 @@ const History = ({ modifyRef }) => {
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <ModalBody>
             <Stack>
-              <Alert status="error">
-                <AlertIcon />
+              <Alert
+                status="error"
+                bg={colorMode === "dark" ? "red.400" : "red.200"}
+              >
+                <AlertIcon color={colorMode === "dark" ? "#fff" : "red.500"} />
                 Your invoice details are not set up. Please fill in the required
                 field below. These can be edited by going to the dropdown menu
                 on the top right of the page
@@ -418,7 +431,7 @@ const History = ({ modifyRef }) => {
               <BiSortAlt2
                 size={20}
                 cursor={"pointer"}
-                color={"gray"}
+                color={colorMode === "light" ? "gray" : "#CBD5E0"}
                 onClick={sortByDate}
               />
             </span>
@@ -428,7 +441,7 @@ const History = ({ modifyRef }) => {
               <BiSortAlt2
                 size={20}
                 cursor={"pointer"}
-                color={"gray"}
+                color={colorMode === "light" ? "gray" : "#CBD5E0"}
                 onClick={sortByPay}
               />
             </span>
@@ -439,7 +452,10 @@ const History = ({ modifyRef }) => {
       {account?.services?.length === 0 ? (
         <Text fontSize={"sm"}> No history</Text>
       ) : (
-        <Accordion defaultIndex={[0]} allowMultiple>
+        <Accordion
+          defaultIndex={viewHistory.set ? [viewHistory.index] : [0]}
+          allowMultiple
+        >
           {account?.services?.map((acc, index) => (
             <>
               <AccordionItem
@@ -447,6 +463,7 @@ const History = ({ modifyRef }) => {
                 onMouseEnter={() =>
                   dispatch(
                     accountActions.setPrintAccount({
+                      accountIndex,
                       index,
                     })
                   )
@@ -468,7 +485,8 @@ const History = ({ modifyRef }) => {
                           </Text>
                           <Badge
                             size={"sm"}
-                            bg={acc.paid ? "btn.200" : "red.400"}
+                            bg={acc.paid ? "green.300" : "red.300"}
+                            color={colorMode === "dark" && "#000"}
                           >
                             {acc.paid ? "Yes" : "No"}
                           </Badge>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Tooltip,
   Flex,
@@ -30,15 +30,16 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useColorMode,
 } from "@chakra-ui/react";
 import { IoIosAdd, IoIosClose, IoIosAddCircleOutline } from "react-icons/io";
 import { BsArrowUp } from "react-icons/bs";
 import { IoIosCheckboxOutline, IoIosCheckbox } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
 import { accountActions } from "../../store/accountSlice";
-import { taxActions } from "../../store/taxSlice";
 import { submitServiceEntry, saveEntries } from "../../actions/entries";
-import { retrieveAccountData, retrieveAccount } from "../../actions/accounts";
+import { retrieveAccountData } from "../../actions/accounts";
+import { clearServiceEntries } from "../../actions/entries";
 import { useRouter } from "next/router";
 import { numberArray, getDateByMonth } from "../../utils/helpers";
 import { v4 as uuidv4 } from "uuid";
@@ -46,12 +47,14 @@ import QuickNotes from "./accounts/modals/QuickNotes";
 import Tax from "./accounts/modals/Tax";
 
 const Entries = ({ historyRef }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
-  const { company: slug, accNo } = router.query;
+  const { accNo } = router.query;
   const dispatch = useDispatch();
-  const { account } = useSelector((state) => state.accounts);
-
   const { accounts } = useSelector((state) => state.accounts);
+  const { viewHistory } = useSelector((state) => state.user);
+  const account = accounts.find((acc) => acc._id === accNo);
+  const accountIndex = accounts?.findIndex((acc) => acc._id === account?._id);
   const { taxes, selectedStates } = useSelector((state) => state.taxes);
   const { user } = useSelector((state) => state.user);
   const [option, setOption] = useState("service");
@@ -61,7 +64,6 @@ const Entries = ({ historyRef }) => {
   const [quickDesc, setQuickDesc] = useState("");
   const [error, setError] = useState(false);
   const toast = useToast();
-  const accountIndex = accounts?.findIndex((acc) => acc._id === account?._id);
 
   const {
     isOpen: isQuickOpen,
@@ -97,13 +99,16 @@ const Entries = ({ historyRef }) => {
 
       await submitServiceEntry(user._id, accNo, entry);
 
-      dispatch(accountActions.addServices({ entry }));
+      dispatch(accountActions.addServices({ accountIndex, entry }));
 
       historyRef.current.click();
 
-      dispatch(accountActions.clearEntries());
+      dispatch(accountActions.clearEntries({ accountIndex }));
 
-      const data = await retrieveAccountData(slug, accNo);
+      //clear the entries in the database
+      await clearServiceEntries(user._id, accNo);
+
+      const data = await retrieveAccountData(user._id, accNo);
       dispatch(accountActions.setAccData(data));
 
       setError(false);
@@ -142,20 +147,20 @@ const Entries = ({ historyRef }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data, taxData } = await retrieveAccount(slug, accNo);
-      dispatch(accountActions.setAccount({ account: data }));
-      dispatch(taxActions.setTax(taxData));
-    };
-
-    fetchData().catch(console.error);
-  }, []);
+    if (viewHistory.set) {
+      historyRef.current.click();
+    }
+  });
 
   return (
     <>
       {error && (
-        <Alert status="error" my={"1rem"}>
-          <AlertIcon />
+        <Alert
+          status="error"
+          my={"1rem"}
+          bg={colorMode === "dark" ? "red.400" : "red.200"}
+        >
+          <AlertIcon color={colorMode === "dark" ? "#fff" : "red.500"} />
           <AlertTitle mr={2} fontSize={"sm"}>
             At least one field is empty!
           </AlertTitle>
@@ -197,6 +202,9 @@ const Entries = ({ historyRef }) => {
                     key={index}
                     size={"sm"}
                     placeholder={service}
+                    _placeholder={{
+                      color: colorMode === "dark" && "gray.300",
+                    }}
                     mb={".5rem"}
                     cursor={"pointer"}
                     style={{
@@ -218,6 +226,9 @@ const Entries = ({ historyRef }) => {
                   key={index}
                   size={"sm"}
                   placeholder={service}
+                  _placeholder={{
+                    color: colorMode === "dark" && "gray.300",
+                  }}
                   mb={".5rem"}
                   cursor={"pointer"}
                   style={{
@@ -246,6 +257,7 @@ const Entries = ({ historyRef }) => {
                   ? dispatch(
                       accountActions.setQuickNote({
                         type: "service",
+                        accountIndex,
                         index: serviceIndex,
                         value: quickService,
                       })
@@ -253,6 +265,7 @@ const Entries = ({ historyRef }) => {
                   : dispatch(
                       accountActions.setQuickNote({
                         type: "desc",
+                        accountIndex,
                         index: descIndex,
                         value: quickDesc,
                       })
@@ -265,8 +278,6 @@ const Entries = ({ historyRef }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* Tax Modal */}
 
       <Flex justify="end" w={"100%"} gap={"1rem"} align={"center"}>
         {taxes.taxSetUp && <QuickNotes />}
@@ -304,6 +315,7 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "service",
+                            accountIndex,
                             value: e.target.value,
                             index,
                           })
@@ -346,6 +358,7 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "description",
+                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -388,6 +401,7 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "qty",
+                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -423,6 +437,7 @@ const Entries = ({ historyRef }) => {
                         dispatch(
                           accountActions.recordField({
                             field: "amount",
+                            accountIndex,
                             index,
                             value: e.target.value,
                           })
@@ -470,14 +485,15 @@ const Entries = ({ historyRef }) => {
                         />
 
                         <MenuList fontSize={"sm"}>
-                          {selectedStates.map((state, index) => (
+                          {selectedStates.map((state, stateIndex) => (
                             <MenuItem
-                              key={index}
+                              key={stateIndex}
                               _hover={{ bg: "gray.200" }}
                               onClick={() =>
                                 dispatch(
                                   accountActions.recordField({
                                     field: "tax",
+                                    accountIndex,
                                     index: index,
                                     value: state,
                                   })
@@ -493,6 +509,7 @@ const Entries = ({ historyRef }) => {
                               onClick={() =>
                                 dispatch(
                                   accountActions.noSalesTax({
+                                    accountIndex,
                                     index,
                                   })
                                 )
@@ -520,7 +537,7 @@ const Entries = ({ historyRef }) => {
                   )}
 
                   <Flex justify={"center"}>
-                    <Flex>
+                    <Flex className={colorMode === "dark" && "date-picker"}>
                       <Input
                         size={"sm"}
                         type={"date"}

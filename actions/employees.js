@@ -16,7 +16,7 @@ export const addEmployee = (user, newEmp) => {
     .catch((err) => console.log(err));
 };
 
-export const updateEmployeeInfo = (slug, empNo, updatedEmp) => {
+export const updateEmployeeInfo = (userId, empNo, updatedEmp) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/employees`, {
     method: "PUT",
     headers: {
@@ -24,7 +24,7 @@ export const updateEmployeeInfo = (slug, empNo, updatedEmp) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      slug,
+      userId,
       empNo,
       updatedEmp,
     }),
@@ -35,7 +35,7 @@ export const updateEmployeeInfo = (slug, empNo, updatedEmp) => {
     .catch((err) => console.log(err));
 };
 
-export const removeEmployee = (slug, empNo) => {
+export const removeEmployee = (userId, empNo) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/employees`, {
     method: "DELETE",
     headers: {
@@ -43,7 +43,7 @@ export const removeEmployee = (slug, empNo) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      slug,
+      userId,
       empNo,
     }),
   })
@@ -53,7 +53,7 @@ export const removeEmployee = (slug, empNo) => {
     .catch((err) => console.log(err));
 };
 
-export const setHourlyWage = (slug, empNo, wage) => {
+export const setHourlyWage = (userId, empNo, wage) => {
   return fetch(`${process.env.NEXT_PUBLIC_API}/employees/wage`, {
     method: "POST",
     headers: {
@@ -61,7 +61,7 @@ export const setHourlyWage = (slug, empNo, wage) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      slug,
+      userId,
       empNo,
       wage,
     }),
@@ -129,8 +129,8 @@ export const retrieveEmployeeData = (user, employee) => {
     .catch((err) => console.log(err));
 };
 
-export const retrieveEmployees = (user) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API}/employees/${user}`, {
+export const retrieveEmployees = (userId) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API}/employees/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

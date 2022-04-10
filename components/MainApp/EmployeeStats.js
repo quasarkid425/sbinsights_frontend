@@ -1,3 +1,4 @@
+import { useColorMode } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +9,6 @@ import {
   Legend,
 } from "chart.js";
 import { useSelector } from "react-redux";
-import { Text } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(
@@ -21,17 +21,35 @@ ChartJS.register(
 );
 
 const EmployeeStats = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { employeeStats } = useSelector((state) => state.employees);
 
   const options = {
     responsive: true,
+    color: colorMode === "dark" && "#fff",
     plugins: {
       legend: {
         position: "top",
       },
       title: {
         display: true,
+        color: colorMode === "dark" && "#fff",
         text: "Total Paid to Employee By Day",
+        font: {
+          size: 14,
+        },
+      },
+    },
+    scales: {
+      y: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
+      },
+      x: {
+        ticks: {
+          color: colorMode === "dark" && "#fff",
+        },
       },
     },
   };
@@ -43,6 +61,7 @@ const EmployeeStats = () => {
 
   const empData = {
     labels,
+
     datasets: [
       {
         label: "Amount total",

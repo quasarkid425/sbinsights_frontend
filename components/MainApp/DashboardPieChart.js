@@ -1,21 +1,28 @@
 import React from "react";
+import { useColorMode } from "@chakra-ui/react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { useSelector } from "react-redux";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const DashboardPieChart = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const data = useSelector((state) => state.charts.pieData);
 
   const options = {
     responsive: true,
+    color: colorMode === "dark" && "#fff",
     plugins: {
       legend: {
         position: "top",
       },
       title: {
         display: true,
+        color: colorMode === "dark" && "#fff",
         text: "Billed Accounts - Paid vs Unpaid",
+        font: {
+          size: 14,
+        },
       },
     },
   };

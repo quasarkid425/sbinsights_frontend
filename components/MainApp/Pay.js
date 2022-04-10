@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Flex,
@@ -22,14 +22,14 @@ import {
   AlertDescription,
   CloseButton,
   useToast,
+  useColorMode,
 } from "@chakra-ui/react";
+import { setHourlyWage, retrieveEmployeeData } from "../../actions/employees";
 import {
-  setHourlyWage,
-  retrieveEmployeeData,
-  retrieveEmployee,
-} from "../../actions/employees";
-import { IoIosAdd } from "react-icons/io";
-import { GrCircleInformation } from "react-icons/gr";
+  IoIosAdd,
+  IoIosInformationCircleOutline,
+  IoIosInformationCircle,
+} from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { employeeActions } from "../../store/employeeSlice";
@@ -37,9 +37,12 @@ import { v4 as uuidv4 } from "uuid";
 import { submitPaidEntry } from "../../actions/employees";
 
 const Pay = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const router = useRouter();
-  const { company: slug, empNo } = router.query;
-  const { employee } = useSelector((state) => state.employees);
+  const { empNo } = router.query;
+  const { employees } = useSelector((state) => state.employees);
+  const employee = employees.find((emp) => emp._id === empNo);
+  const empIndex = employees?.findIndex((emp) => emp._id === employee?._id);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [error, setError] = useState(false);
@@ -48,13 +51,9 @@ const Pay = () => {
   const { wage } = useSelector((state) => state.employees);
   const dispatch = useDispatch();
 
-  const setHourlyWageHandler = () => {
+  const setHourlyWageHandler = async () => {
     setError(false);
-    setHourlyWage(
-      router.query.company,
-      router.query.empNo,
-      employee.pay.hourlyWage
-    );
+    await setHourlyWage(user._id, empNo, employee.pay.hourlyWage);
     onClose();
   };
 
@@ -84,6 +83,7 @@ const Pay = () => {
       }
       dispatch(
         employeeActions.recordPaidEntry({
+          empIndex,
           entry,
           wage,
         })
@@ -91,7 +91,7 @@ const Pay = () => {
 
       //submit pay to db
 
-      await submitPaidEntry(user._id, router.query.empNo, entry);
+      await submitPaidEntry(user._id, empNo, entry);
 
       toast({
         description: "Recorded successfully",
@@ -102,28 +102,22 @@ const Pay = () => {
       });
 
       //get the updated stats and set the state
-      const data = await retrieveEmployeeData(
-        router.query.company,
-        router.query.empNo
-      );
+      const data = await retrieveEmployeeData(user._id, empNo);
 
       dispatch(employeeActions.setEmpData(data));
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await retrieveEmployee(slug, empNo);
-      dispatch(employeeActions.setEmployee(data));
-    };
-    fetchData().catch(console.error);
-  }, []);
-
   return (
     <>
       {error && (
-        <Alert status="error" fontSize={"sm"} my={"1rem"}>
-          <AlertIcon />
+        <Alert
+          status="error"
+          fontSize={"sm"}
+          my={"1rem"}
+          bg={colorMode === "dark" ? "red.400" : "red.200"}
+        >
+          <AlertIcon color={colorMode === "dark" ? "#fff" : "red.500"} />
           <AlertTitle mr={2}>Empty fields!</AlertTitle>
           <AlertDescription>All fields must be filled out</AlertDescription>
           <CloseButton
@@ -150,6 +144,7 @@ const Pay = () => {
                   dispatch(
                     employeeActions.recordField({
                       field: "hourlyWage",
+                      empIndex,
                       value: e.target.value,
                     })
                   );
@@ -157,9 +152,9 @@ const Pay = () => {
                 type={"number"}
                 value={
                   wage
-                    ? employee.pay?.hourlyWage === 0
+                    ? employee?.pay?.hourlyWage === 0
                       ? ""
-                      : employee.pay?.hourlyWage
+                      : employee?.pay?.hourlyWage
                     : ""
                 }
               />
@@ -188,7 +183,7 @@ const Pay = () => {
         gap={"1rem"}
         w={{ base: "100%", md: "50%", lg: "25%" }}
       >
-        <FormControl>
+        <FormControl className={colorMode === "dark" && "date-picker"}>
           <FormLabel htmlFor="date" fontSize={"sm"}>
             Date
           </FormLabel>
@@ -200,11 +195,12 @@ const Pay = () => {
               dispatch(
                 employeeActions.recordField({
                   field: "date",
+                  empIndex,
                   value: e.target.value,
                 })
               );
             }}
-            value={employee.pay?.date}
+            value={employee?.pay?.date}
           />
         </FormControl>
         <FormControl>
@@ -214,12 +210,13 @@ const Pay = () => {
           <Input
             type={"number"}
             step="0.01"
-            value={employee.pay?.hours === 0 ? "" : employee.pay?.hours}
+            value={employee?.pay?.hours === 0 ? "" : employee?.pay?.hours}
             onChange={(e) => {
               setError(false);
               dispatch(
                 employeeActions.recordField({
                   field: "hours",
+                  empIndex,
                   value: e.target.value,
                 })
               );
@@ -235,7 +232,14 @@ const Pay = () => {
                 fontSize="md"
               >
                 <span>
-                  <GrCircleInformation cursor={"pointer"} size={15} />
+                  {colorMode === "light" ? (
+                    <IoIosInformationCircleOutline
+                      cursor={"pointer"}
+                      size={15}
+                    />
+                  ) : (
+                    <IoIosInformationCircle cursor={"pointer"} size={15} />
+                  )}
                 </span>
               </Tooltip>
             </Flex>
@@ -250,6 +254,7 @@ const Pay = () => {
                 dispatch(
                   employeeActions.recordField({
                     field: "amount",
+                    empIndex,
                     value: e.target.value,
                   })
                 );
@@ -257,12 +262,12 @@ const Pay = () => {
               type={"number"}
               value={
                 wage
-                  ? employee.pay?.hourlyWage === 0
+                  ? employee?.pay?.hourlyWage === 0
                     ? ""
-                    : employee.pay?.hourlyWage.toFixed(2)
-                  : employee.pay?.wage === 0
+                    : employee?.pay?.hourlyWage.toFixed(2)
+                  : employee?.pay?.wage === 0
                   ? ""
-                  : employee.pay?.wage
+                  : employee?.pay?.wage
               }
             />
           </Flex>
@@ -275,9 +280,9 @@ const Pay = () => {
             </Text>
             <Text fontWeight={"semibold"} fontSize={"md"}>
               $
-              {isNaN(employee.pay?.total?.toFixed(2))
+              {isNaN(employee?.pay?.total?.toFixed(2))
                 ? ""
-                : employee.pay?.total?.toFixed(2)}
+                : employee?.pay?.total?.toFixed(2)}
             </Text>
           </Stack>
         </Flex>

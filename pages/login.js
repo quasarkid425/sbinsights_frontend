@@ -56,6 +56,45 @@ const Login = () => {
         });
         setIsSubmitting(false);
       } else {
+        // console.log(data);
+        // const newAccounts = data.accounts.map((acc) => {
+        //   return {
+        //     ...acc,
+        //     entries: acc.entries.map((ent) => {
+        //       if (ent.service === "" && ent.desc === "") {
+        //         return {
+        //           ...ent,
+        //           date: getDateByYear(),
+        //         };
+        //       } else {
+        //         return {
+        //           ...ent,
+        //         };
+        //       }
+        //     }),
+        //   };
+        // });
+
+        // const newEmployees = data.employees.map((emp) => {
+        //   return {
+        //     ...emp,
+        //     pay: {
+        //       chartDate: emp.pay.chartDate,
+        //       date: getDateByYear(),
+        //       hourlyWage: emp.pay.hourlyWage,
+        //       hours: emp.pay.hours,
+        //       total: emp.pay.toa
+        //     },
+        //   };
+        // });
+
+        // console.log(newEmployees);
+        // dispatch(userActions.setUser(data.user));
+        // dispatch(employeeActions.setEmployees(data.employees));
+        // dispatch(accountActions.setAccounts(newAccounts));
+        // dispatch(expenseActions.setAllExpenses(data.expenses));
+        // dispatch(taxActions.setTax(data.taxes));
+
         dispatch(userActions.setUser(data.user));
         dispatch(taxActions.setTax(data.taxes));
         toast({
@@ -75,7 +114,7 @@ const Login = () => {
   return (
     <>
       <Head>
-        <title>Company Name || Login</title>
+        <title>SBInsights || Login</title>
         {/* <meta name="description" content={product.desc} /> */}
       </Head>
       <Flex

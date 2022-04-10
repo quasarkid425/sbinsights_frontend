@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ExpenseStats from "../MainApp/ExpenseStats";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Flex,
   Input,
   InputGroup,
@@ -52,7 +46,6 @@ import {
   IoIosAddCircleOutline,
   IoIosStats,
 } from "react-icons/io";
-import { useRouter } from "next/router";
 import { expenseActions } from "../../store/expenseSlice";
 
 const Expenses = () => {
@@ -63,7 +56,6 @@ const Expenses = () => {
   const dispatch = useDispatch();
   const [amountError, setAmountError] = useState(false);
   const [descError, setDescError] = useState(false);
-  const { company } = useRouter().query;
 
   const {
     isOpen: isExpOpen,
@@ -108,7 +100,7 @@ const Expenses = () => {
     //Submit expenses to db
     await addExpense(user._id, expense);
 
-    const data = await retrieveExpenseData(company);
+    const data = await retrieveExpenseData(user._id);
     dispatch(expenseActions.setExpData(data));
     //clear fields
     dispatch(expenseActions.clearFields());
@@ -134,24 +126,12 @@ const Expenses = () => {
     //remove expense from db
     await removeExpense(user._id, expenses, removeIndex);
 
-    const data = await retrieveExpenseData(company);
+    const data = await retrieveExpenseData(user._id);
     dispatch(expenseActions.setExpData(data));
 
     setInputDropName("");
     onEditClose();
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await retrieveExpenses(user._id);
-      dispatch(expenseActions.setAllExpenses(data));
-
-      const stats = await retrieveExpenseData(company);
-      dispatch(expenseActions.setExpData(stats));
-    };
-
-    fetchData().catch(console.error);
-  }, []);
 
   return (
     <>
@@ -178,7 +158,10 @@ const Expenses = () => {
             }}
           />
           <ModalBody>
-            <FormControl isRequired>
+            <FormControl
+              isRequired
+              className={colorMode === "dark" && "date-picker"}
+            >
               <FormLabel htmlFor="date" fontSize={"sm"}>
                 Date
               </FormLabel>
@@ -344,6 +327,9 @@ const Expenses = () => {
                 <Input
                   size={"sm"}
                   placeholder="Enter name"
+                  _placeholder={{
+                    color: colorMode === "dark" && "gray.300",
+                  }}
                   value={inputDropName}
                   onChange={(e) => setInputDropName(e.target.value)}
                 />
@@ -411,6 +397,9 @@ const Expenses = () => {
                       mb={".5rem"}
                       size={"sm"}
                       placeholder={amt === "" ? amt : ""}
+                      _placeholder={{
+                        color: colorMode === "dark" && "gray.300",
+                      }}
                       value={amt}
                       onChange={(e) => {
                         dispatch(
@@ -463,6 +452,9 @@ const Expenses = () => {
                     <Input
                       mb={".5rem"}
                       placeholder={desc === "" ? desc : ""}
+                      _placeholder={{
+                        color: colorMode === "dark" && "gray.300",
+                      }}
                       value={desc}
                       onChange={(e) => {
                         dispatch(
@@ -538,6 +530,8 @@ const Expenses = () => {
           mb={".5rem"}
           align={"center"}
           justifyContent={expenses.length === 0 ? "center" : "space-between"}
+          direction={{ base: "column-reverse", md: "row" }}
+          gap={{ base: "1rem", md: "0" }}
         >
           <Flex gap={"1rem"} align={"center"}>
             <Button
@@ -587,11 +581,25 @@ const Expenses = () => {
             <>
               <Heading size={"sm"}>Expenses</Heading>
 
-              <InputGroup w={"25%"} size={"sm"}>
+              <InputGroup size={"sm"} w={{ base: "75%", md: "25%" }}>
                 <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.300" />
+                  <SearchIcon
+                    color={colorMode === "light" ? "gray.300" : "#e4e4e4"}
+                  />
                 </InputLeftElement>
                 <Input
+                  style={{
+                    border:
+                      colorMode === "dark"
+                        ? "1px solid #fff"
+                        : "0.1rem solid #e4e4e4",
+                  }}
+                  _hover={{
+                    borderColor: colorMode === "dark" && "#e4e4e4",
+                  }}
+                  _placeholder={{
+                    color: colorMode === "dark" && "#e4e4e4",
+                  }}
                   type="text"
                   placeholder="Search expenses"
                   onChange={(e) => {
@@ -615,12 +623,12 @@ const Expenses = () => {
             </Grid>
           </>
         ) : (
-          <Table variant={"simple"} fontSize={"sm"}>
-            <Thead>
-              <Tr>
+          <table className="table">
+            <thead>
+              <tr>
                 {headings.map((heading, index) => (
-                  <Th key={index}>
-                    <Flex align={"center"} gap={"1rem"}>
+                  <th key={index}>
+                    <Flex justify={"center"} align={"center"} gap={"1rem"}>
                       <Box fontSize={".75rem"}>{heading}</Box>
                       <Flex>
                         <BsSortAlphaDown
@@ -637,12 +645,11 @@ const Expenses = () => {
                         />
                       </Flex>
                     </Flex>
-                  </Th>
+                  </th>
                 ))}
-              </Tr>
-            </Thead>
-
-            <Tbody>
+              </tr>
+            </thead>
+            <tbody>
               {expenses
                 ?.filter((expense) => {
                   if (searchTerm === "") {
@@ -663,18 +670,13 @@ const Expenses = () => {
                   }
                 })
                 .map((expense, index) => (
-                  <Tr
-                    key={index}
-                    _hover={{
-                      color: colorMode === "light" ? "gray.800" : "gray.800",
-                      bg: "gray.200",
-                    }}
-                  >
-                    <Td>{expense.date}</Td>
-                    <Td>${parseFloat(expense.amount).toFixed(2)}</Td>
-                    <Td>{expense.desc}</Td>
-
-                    <Flex align={"center"} gap={"1rem"} mt={".75rem"}>
+                  <tr key={index} className={"expense-row"}>
+                    <td data-label="Date">{expense.date}</td>
+                    <td data-label="Amount">
+                      ${parseFloat(expense.amount).toFixed(2)}
+                    </td>
+                    <td data-label="Description">{expense.desc}</td>
+                    <Flex align={"center"} gap={"1rem"} mt={".5rem"}>
                       <Tooltip label="Remove Expense" fontSize="md">
                         <span>
                           <IoIosClose
@@ -688,10 +690,10 @@ const Expenses = () => {
                         </span>
                       </Tooltip>
                     </Flex>
-                  </Tr>
+                  </tr>
                 ))}
-            </Tbody>
-          </Table>
+            </tbody>
+          </table>
         )}
       </Stack>
     </>

@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Flex,
   Input,
   InputGroup,
@@ -17,7 +11,6 @@ import {
   Text,
   Grid,
 } from "@chakra-ui/react";
-import { retrieveAccounts } from "../../actions/accounts";
 import { BsSortAlphaDown, BsSortAlphaUpAlt } from "react-icons/bs";
 import { BsArrowUp } from "react-icons/bs";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -52,14 +45,6 @@ const Accounts = () => {
     dispatch(accountActions.sortCollectionDesc(type));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await retrieveAccounts(user._id);
-      dispatch(accountActions.setAccounts({ accounts: data }));
-    };
-    fetchData().catch(console.error);
-  }, []);
-
   return (
     <>
       <Stack spacing={accounts.length === 0 ? "" : "1rem"}>
@@ -68,18 +53,30 @@ const Accounts = () => {
           mb={".5rem"}
           align={"center"}
           justifyContent={accounts.length === 0 ? "center" : "space-between"}
+          direction={{ base: "column-reverse", md: "row" }}
+          gap={{ base: "1rem", md: "0" }}
         >
           {accounts.length > 0 && (
             <>
               <AddAccount />
               <Heading size={"sm"}>Accounts</Heading>
 
-              <InputGroup w={"25%"} size={"sm"}>
+              <InputGroup size={"sm"} w={{ base: "75%", md: "25%" }}>
                 <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.300" />
+                  <SearchIcon
+                    color={colorMode === "light" ? "gray.300" : "#e4e4e4"}
+                  />
                 </InputLeftElement>
                 <Input
                   type="text"
+                  style={{
+                    border:
+                      colorMode === "dark"
+                        ? "1px solid #fff"
+                        : "0.1rem solid #e4e4e4",
+                  }}
+                  _hover={{ borderColor: colorMode === "dark" && "#e4e4e4" }}
+                  _placeholder={{ color: colorMode === "dark" && "#e4e4e4" }}
                   placeholder="Search accounts"
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -103,12 +100,12 @@ const Accounts = () => {
             </Grid>
           </>
         ) : (
-          <Table variant={"simple"} fontSize={"sm"}>
-            <Thead>
-              <Tr>
+          <table className="table">
+            <thead>
+              <tr>
                 {headings.map((heading, index) => (
-                  <Th key={index}>
-                    <Flex align={"center"} gap={".5rem"}>
+                  <th key={index}>
+                    <Flex justify={"center"} align={"center"} gap={".5rem"}>
                       <Box fontSize={".75rem"}>{heading}</Box>
                       <Flex>
                         <BsSortAlphaDown
@@ -125,12 +122,11 @@ const Accounts = () => {
                         />
                       </Flex>
                     </Flex>
-                  </Th>
+                  </th>
                 ))}
-              </Tr>
-            </Thead>
-
-            <Tbody>
+              </tr>
+            </thead>
+            <tbody>
               {accounts
                 ?.filter((account) => {
                   if (searchTerm === "") {
@@ -169,53 +165,51 @@ const Accounts = () => {
                     href={`/${user.slug}/account/${account._id}`}
                     key={uuidv4()}
                   >
-                    <Tr
-                      key={uuidv4()}
-                      _hover={{
-                        color: colorMode === "light" ? "gray.800" : "gray.800",
-                        bg: "gray.200",
-                      }}
-                      cursor={"pointer"}
-                    >
-                      <Td key={`${account.accFullName} ` + uuidv4()}>
+                    <tr key={uuidv4()} className="table-hover">
+                      <td
+                        key={`${account.accFullName} ` + uuidv4()}
+                        data-label="Name"
+                      >
                         {account.accFullName ? account.accFullName : "N/A"}
-                      </Td>
-                      <Td>
+                      </td>
+                      <td data-label="Phone">
                         {account.accPhoneNumber
                           ? account.accPhoneNumber
                           : "N/A"}
-                      </Td>
-                      <Td>{account.accEmail ? account.accEmail : "N/A"}</Td>
-                      <Td>
+                      </td>
+                      <td data-label="Email">
+                        {account.accEmail ? account.accEmail : "N/A"}
+                      </td>
+                      <td data-label="Billing Name">
                         {account.accAddress.addrFullName
                           ? account.accAddress.addrFullName
                           : "N/A"}
-                      </Td>
-                      <Td>
+                      </td>
+                      <td data-label="Billing Street">
                         {account.accAddress.addrStreet
                           ? account.accAddress.addrStreet
                           : "N/A"}
-                      </Td>
-                      <Td>
+                      </td>
+                      <td data-label="Billing City">
                         {account.accAddress.addrCity
                           ? account.accAddress.addrCity
                           : "N/A"}
-                      </Td>
-                      <Td>
+                      </td>
+                      <td data-label="Billing State">
                         {account.accAddress.addrState
                           ? account.accAddress.addrState
                           : "N/A"}
-                      </Td>
-                      <Td>
+                      </td>
+                      <td data-label="Billing Zip">
                         {account.accAddress.addrZipCode
                           ? account.accAddress.addrZipCode
                           : "N/A"}
-                      </Td>
-                    </Tr>
+                      </td>
+                    </tr>
                   </Link>
                 ))}
-            </Tbody>
-          </Table>
+            </tbody>
+          </table>
         )}
       </Stack>
     </>

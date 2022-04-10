@@ -20,6 +20,7 @@ import {
   useDisclosure,
   Tooltip,
   Input,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -29,21 +30,26 @@ import { employeeActions } from "../../store/employeeSlice";
 import { removePaidEntry, retrieveEmployeeData } from "../../actions/employees";
 
 const PayHistory = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const [inputDropName, setInputDropName] = useState("");
   const [date, setDate] = useState("asc");
   const [entryId, setEntryId] = useState("");
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { company, empNo } = useRouter().query;
+  const { empNo } = useRouter().query;
 
-  const { employee } = useSelector((state) => state.employees);
+  // const { employee } = useSelector((state) => state.employees);
+  const { employees } = useSelector((state) => state.employees);
+  const employee = employees.find((emp) => emp._id === empNo);
+  const empIndex = employees?.findIndex((emp) => emp._id === employee?._id);
 
   const removeEntryHandler = async () => {
     //Remove from account state
 
     dispatch(
       employeeActions.removeAccountService({
+        empIndex,
         empNo,
         entryId,
       })
@@ -62,7 +68,7 @@ const PayHistory = () => {
       entryIndex
     );
 
-    const data = await retrieveEmployeeData(company, empNo);
+    const data = await retrieveEmployeeData(user._id, empNo);
     dispatch(employeeActions.setEmpData(data));
 
     onClose();
@@ -71,10 +77,10 @@ const PayHistory = () => {
 
   const sortByDate = () => {
     if (date === "asc") {
-      dispatch(employeeActions.sortEntriesByDate({ date }));
+      dispatch(employeeActions.sortEntriesByDate({ empIndex, date }));
       setDate("desc");
     } else {
-      dispatch(employeeActions.sortEntriesByDate({ date }));
+      dispatch(employeeActions.sortEntriesByDate({ empIndex, date }));
       setDate("asc");
     }
   };
@@ -155,7 +161,7 @@ const PayHistory = () => {
               <BiSortAlt2
                 size={20}
                 cursor={"pointer"}
-                color={"gray"}
+                color={colorMode === "light" ? "gray" : "#CBD5E0"}
                 onClick={sortByDate}
               />
             </span>
@@ -173,7 +179,7 @@ const PayHistory = () => {
                 <Flex align={"center"}>
                   <AccordionButton _focus={{ boxShadow: "none" }}>
                     <Box flex="1" textAlign="left">
-                      <Flex gap={".5rem"}>
+                      <Flex gap={".5rem"} alignItems={"center"}>
                         <Text fontWeight={"semibold"}>Pay Date:</Text>
                         <Text fontSize={"sm"}> {emp.date}</Text>
                       </Flex>
