@@ -152,6 +152,7 @@ const AccNo = () => {
   useEffect(() => {
     const fetchData = async () => {
       const data = await retrieveAccountData(user._id, accNo);
+      console.log(data);
       dispatch(accountActions.setAccData(data));
     };
 
