@@ -158,7 +158,7 @@ export default function WithSubnavigation() {
           </Button>
 
           {user.isAdmin ? (
-            <Menu>
+            <Menu size={"sm"}>
               <MenuButton
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
@@ -218,8 +218,9 @@ export default function WithSubnavigation() {
               </MenuList>
             </Menu>
           ) : isLoggedIn ? (
-            <Menu>
+            <Menu size={"sm"}>
               <MenuButton
+                size={"sm"}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 variant={"ghost"}
@@ -249,7 +250,7 @@ export default function WithSubnavigation() {
                     color: "green.200",
                   }}
                 >
-                  <MenuItem>Profile</MenuItem>
+                  <MenuItem fontSize={"sm"}>Profile</MenuItem>
                 </Link>
                 <Link
                   href={`/${user.slug}/invoice`}
@@ -257,7 +258,7 @@ export default function WithSubnavigation() {
                     color: "green.200",
                   }}
                 >
-                  <MenuItem>Invoice settings</MenuItem>
+                  <MenuItem fontSize={"sm"}>Invoice settings</MenuItem>
                 </Link>
 
                 <MenuItem
@@ -265,6 +266,7 @@ export default function WithSubnavigation() {
                   _hover={{
                     color: "green.200",
                   }}
+                  fontSize={"sm"}
                 >
                   Sign out
                 </MenuItem>
